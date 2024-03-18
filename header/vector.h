@@ -1,16 +1,17 @@
-#ifndef VECTOR_HPP
-#define VECTOR_HPP
+#ifndef VECTOR_H
+#define VECTOR_H
 
 #include <iostream>
+#include <initializer_list>
 
 namespace DS {
 
 template<typename T>
 class Vector {
 private:
-  T* m_array;
   std::size_t m_size;
   std::size_t m_capacity;
+  T* m_array;
 
 public:
 
@@ -52,6 +53,7 @@ public:
   Vector();
   Vector(const Vector& other);
   Vector(Vector&& other) noexcept;
+  Vector(std::initializer_list<T> list);
   explicit Vector(int count);
   explicit Vector(int count, const T& value);
   // Destructor
@@ -59,11 +61,8 @@ public:
 
   // Assignment operators
   Vector& operator=(const Vector& other);
-  constexpr Vector& operator=( const Vector& other);
-  Vector& operator=(Vector&& other) noexcept;
   Vector& operator=(Vector&& other) noexcept;
   Vector& operator=(std::initializer_list<T> list);
-  constexpr Vector& operator=( std::initializer_list<T> list);
 
   // Element access
   Const_Iterator operator[](int index);
@@ -133,7 +132,7 @@ public:
 
 }
 
-#include "../src/vector.tcc"
+#include "../src/vector.hpp"
 
 
 #endif // VECTOR_HPP
