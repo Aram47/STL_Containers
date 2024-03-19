@@ -31,13 +31,43 @@ public:
     const Const_Iterator& operator=(const Const_Iterator&);
     const Const_Iterator& operator=(const Const_Iterator&);
 
-    const T& operator*();
-    const T* operator->();
+    const T& operator*(); // return *ptr
+    const T* operator->(); // return ptr
+    Const_Iterator& operator++();
+    Const_Iterator& operator++(int); // return temp
+    Const_Iterator& operator--();
+    Const_Iterator& operator--(int);
+    const Const_Iterator operator+() const;
+    const Const_Iterator operator-() const;
+    Const_Iterator& operator+=(const Const_Iterator&);
+    Const_Iterator& operator-=(const Const_Iterator&);
+    const Const_Iterator& operator[](std::size_t) const;
+    bool operator<(const Const_Iterator& rhv) const; // this->ptr < rhv.ptr
+    bool operator>(const Const_Iterator& rhv) const; // this->ptr > rhv.ptr
+    bool operator<=(const Const_Iterator& rhv) const; // this->ptr <= rhv.ptr
+    bool operator>=(const Const_Iterator& rhv) const; // this->ptr >= rhv.ptr
+    bool operator==(const Const_Iterator& rhv) const; // this->ptr == rhv.ptr
+    bool operator!=(const Const_Iterator& rhv) const; // !(*this == rhv)
   };
 
   class Iterator : public Const_Iterator
   {
+  public:
+    Iterator(const Const_Iterator& rhv);
+    Iterator(const Const_Iterator& rhv);
 
+    T& operator*();
+    T* operator->();
+
+    const Iterator& operator=(const Const_Iterator& rhv); //O(1)
+    const Iterator& operator=(Const_Iterator&& rhv);
+    explicit Iterator(T* ptr);
+    //def constr
+    // param constr delegate const_iter param constructor
+    // copy ctor
+    // move ctor
+    // non assignments operators (copy, move)
+    //[], ->, *, 
   };
 
   class Const_Reverse_Iterator 
@@ -137,4 +167,3 @@ public:
 
 
 #endif // VECTOR_HPP
-
