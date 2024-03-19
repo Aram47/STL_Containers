@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <initializer_list>
+#include <stdexcept>
 
 namespace DS {
 
@@ -21,7 +22,7 @@ public:
   private:
     T* ptr;
   protected:
-    explicit Const_Iterator(T* p) : ptr(p) {};
+    explicit Const_Iterator(const T* p) : ptr(p) {};
   public:
     Const_Iterator() : ptr(nullptr) {};
     Const_Iterator(const Const_Iterator& other);
@@ -77,10 +78,10 @@ public:
   bool operator>=(const Vector<T>& other) const;
 
   // Element access
-  T& operator[](int pos);
-  const T& operator[](int pos) const;
+  T& operator[](std::size_t pos);
+  const T& operator[](std::size_t pos) const;
   T& at(int pos);
-  const T& at(size_type pos) const;
+  const T& at(int pos) const;
   T& front();
   const T& front() const;
   T& back();
@@ -106,7 +107,7 @@ public:
   bool empty() const noexcept;
   std::size_t size() const noexcept;
   std::size_t max_size() const noexcept;
-  void reserve(int new_cap);
+  void reserve(std::size_t new_cap);
   std::size_t capacity() const noexcept;
   void shrink_to_fit() noexcept;
 
@@ -125,8 +126,8 @@ public:
   template<typename... Args>
   T& emplace_back(Args&&... args);
   void pop_back();
-  void resize(int count);
-  void resize(int count, const T& value);
+  void resize(std::size_t count);
+  void resize(std::size_t count, const T& value);
   void swap(Vector& other);
 };
 
