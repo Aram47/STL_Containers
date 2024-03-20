@@ -4,6 +4,480 @@
 #include <initializer_list>
 #include <stdexcept>
 
+
+template <typename T>
+DS::Vector<T>::Base_Iterator::Base_Iterator(T* p)
+            : ptr(p)
+{
+
+}
+
+template <typename T>
+DS::Vector<T>::Base_Iterator::~Base_Iterator()
+{
+    if (this -> ptr)
+        delete this -> ptr;
+
+    this -> ptr = nullptr;
+}
+
+template <typename T>
+bool DS::Vector<T>::Base_Iterator::operator<(const DS::Vector<T>::Base_Iterator& rhv) const
+{
+    return ((this -> ptr) < (rhv.ptr));
+}
+
+template <typename T>
+bool DS::Vector<T>::Base_Iterator::operator>(const DS::Vector<T>::Base_Iterator& rhv) const
+{
+    return ((this -> ptr) > (rhv.ptr));
+}
+
+template <typename T>
+bool DS::Vector<T>::Base_Iterator::operator<=(const DS::Vector<T>::Base_Iterator& rhv) const
+{
+    return ((this -> ptr) <= (rhv.ptr));
+}
+
+template <typename T>
+bool DS::Vector<T>::Base_Iterator::operator>=(const DS::Vector<T>::Base_Iterator& rhv) const
+{
+    return ((this -> ptr) >= (rhv.ptr));
+}
+
+template <typename T>
+bool DS::Vector<T>::Base_Iterator::operator==(const DS::Vector<T>::Base_Iterator& rhv) const
+{
+    return ((this -> ptr) == (rhv.ptr));
+}
+
+template <typename T>
+bool DS::Vector<T>::Base_Iterator::operator!=(const DS::Vector<T>::Base_Iterator& rhv) const
+{
+    return !(*this == rhv);
+}
+
+template <typename T>
+const typename DS::Vector<T>::Base_Iterator& DS::Vector<T>::Base_Iterator::operator=(const DS::Vector<T>::Base_Iterator& rhv)
+{
+    if (this == &rhv)
+        return *this;
+
+    this -> ptr = rhv.ptr;
+    
+    return *this;
+} 
+
+template <typename T>
+const typename DS::Vector<T>::Base_Iterator& DS::Vector<T>::Base_Iterator::operator=(DS::Vector<T>::Base_Iterator&& rhv)
+{
+    if (this == &rhv)
+        return *this;
+
+    this -> ptr = rhv.ptr;
+    rhv.ptr = nullptr;
+
+    return *this;
+}
+
+template <typename T>
+DS::Vector<T>::Const_Iterator::Const_Iterator(T* p)
+            : DS::Vector<T>::Base_Iterator(p)
+{
+
+}
+
+template <typename T>
+DS::Vector<T>::Const_Iterator::Const_Iterator()
+            : DS::Vector<T>::Base_Iterator(nullptr)
+{
+
+}
+
+template <typename T>
+DS::Vector<T>::Const_Iterator::Const_Iterator(const DS::Vector<T>::Base_Iterator& rhv)
+            : DS::Vector<T>::Base_Iterator(rhv.ptr)
+{
+
+}
+
+template <typename T>
+DS::Vector<T>::Const_Iterator::Const_Iterator(DS::Vector<T>::Base_Iterator&& rhv)
+            : DS::Vector<T>::Base_Iterator(rhv.ptr)
+{
+    rhv.ptr = nullptr;
+}
+
+template <typename T>
+const typename DS::Vector<T>::Const_Iterator& DS::Vector<T>::Const_Iterator::operator=(const DS::Vector<T>::Base_Iterator& rhv)
+{
+    if (this == &rhv)
+        return *this;
+
+    this -> ptr = rhv.ptr;
+
+    return *this;
+}
+
+template <typename T>
+const typename DS::Vector<T>::Const_Iterator& DS::Vector<T>::Const_Iterator::operator=(DS::Vector<T>::Base_Iterator&& rhv)
+{
+    if (this == &rhv)
+        return *this;
+
+    this -> ptr = rhv.ptr;
+    rhv.ptr = nullptr;
+
+    return *this;
+}
+
+template <typename T>
+const T& DS::Vector<T>::Const_Iterator::operator*()
+{
+    return *(this -> ptr);
+}
+
+template <typename T>
+const T* DS::Vector<T>::Const_Iterator::operator->()
+{
+    return this -> ptr;
+}
+
+template <typename T>
+typename DS::Vector<T>::Const_Iterator& DS::Vector<T>::Const_Iterator::operator++()
+{
+    return ++(this -> ptr);
+}
+
+template <typename T>
+typename DS::Vector<T>::Const_Iterator& DS::Vector<T>::Const_Iterator::operator++(int) // return temp
+{
+    DS::Vector<T>::Const_Iterator temp = *this;
+    ++(this -> ptr);
+
+    return temp;
+}
+
+template <typename T>
+typename DS::Vector<T>::Const_Iterator& DS::Vector<T>::Const_Iterator::operator--()
+{
+    return --(this -> ptr);
+}
+
+template <typename T>
+typename DS::Vector<T>::Const_Iterator& DS::Vector<T>::Const_Iterator::operator--(int)
+{
+    DS::Vector<T>::Const_Iterator temp = *this;
+    --(this -> ptr);
+
+    return temp;
+}
+
+template <typename T>
+const typename DS::Vector<T>::Const_Iterator DS::Vector<T>::Const_Iterator::operator+(long long int arg) const
+{
+    const DS::Vector<T>::Const_Iterator temp = (this -> ptr) + arg;
+
+    return temp;
+}
+
+template <typename T>
+const typename DS::Vector<T>::Const_Iterator DS::Vector<T>::Const_Iterator::operator-(long long int arg) const
+{
+    const DS::Vector<T>::Const_Iterator temp = (this -> ptr) - arg;
+
+    return temp;
+}
+
+template <typename T>
+typename DS::Vector<T>::Const_Iterator& DS::Vector<T>::Const_Iterator::operator+=(long long int arg)
+{
+    this -> ptr += arg;
+
+    return *this;
+}
+
+template <typename T>
+typename DS::Vector<T>::Const_Iterator& DS::Vector<T>::Const_Iterator::operator-=(long long int arg)
+{
+    this -> ptr -= arg;
+
+    return *this;
+}
+
+template <typename T>
+const T& DS::Vector<T>::Const_Iterator::operator[](std::size_t index) const
+{
+    return this -> ptr[index];
+}
+
+template <typename T>
+DS::Vector<T>::Iterator::Iterator()
+            : DS::Vector<T>::Const_Iterator(nullptr)
+{
+
+}
+
+template <typename T>
+DS::Vector<T>::Iterator::Iterator(const DS::Vector<T>::Base_Iterator& rhv)
+            : DS::Vector<T>::Const_Iterator(rhv.ptr)
+{
+
+}
+
+template <typename T>
+DS::Vector<T>::Iterator::Iterator(DS::Vector<T>::Base_Iterator&& rhv)
+            : DS::Vector<T>::Const_Iterator(rhv.ptr)
+{
+    rhv.ptr = nullptr;
+}
+
+template <typename T>
+DS::Vector<T>::Iterator::Iterator(T* p)
+            : DS::Vector<T>::Const_Iterator(p)
+{
+
+}
+
+template <typename T>
+const typename DS::Vector<T>::Iterator& DS::Vector<T>::Iterator::operator=(const DS::Vector<T>::Base_Iterator& rhv)
+{
+    if (this == &rhv)
+        return *this;
+
+    this -> ptr = rhv.ptr;
+
+    return *this;
+}
+
+template <typename T>
+const typename DS::Vector<T>::Iterator& DS::Vector<T>::Iterator::operator=(DS::Vector<T>::Base_Iterator&& rhv)
+{
+    if (this == &rhv)
+        return *this;
+
+    this -> ptr = rhv.ptr;
+    rhv.ptr = nullptr;
+
+    return *this;
+}
+
+template <typename T>
+T& DS::Vector<T>::Iterator::operator*()
+{
+    return *(this -> ptr);
+}
+
+template <typename T>
+T* DS::Vector<T>::Iterator::operator->()
+{
+    return this -> ptr;
+}
+
+template <typename T>
+T& DS::Vector<T>::Iterator::operator[](std::size_t index)
+{
+    return this -> ptr[index];
+}
+
+template <typename T>
+DS::Vector<T>::Const_Reverse_Iterator::Const_Reverse_Iterator(T* p)
+                    : DS::Vector<T>::Base_Iterator(p)
+{
+
+}
+
+template <typename T>
+DS::Vector<T>::Const_Reverse_Iterator::Const_Reverse_Iterator()
+                    : DS::Vector<T>::Base_Iterator(nullptr)
+{
+
+}
+
+template <typename T>
+DS::Vector<T>::Const_Reverse_Iterator::Const_Reverse_Iterator(const DS::Vector<T>::Base_Iterator& rhv)
+                    : DS::Vector<T>::Base_Iterator(rhv.ptr)
+{
+
+}
+
+template <typename T>
+DS::Vector<T>::Const_Reverse_Iterator::Const_Reverse_Iterator(DS::Vector<T>::Base_Iterator&& rhv)
+                    : DS::Vector<T>::Base_Iterator(rhv.ptr)
+{
+    rhv.ptr = nullptr;
+}
+
+template <typename T>
+const typename DS::Vector<T>::Const_Reverse_Iterator& DS::Vector<T>::Const_Reverse_Iterator::operator=(const DS::Vector<T>::Base_Iterator& rhv)
+{
+    if (this == &rhv)
+        return *this;
+
+    this -> ptr = rhv.ptr;
+
+    return *this;
+}
+
+template <typename T>
+const typename DS::Vector<T>::Const_Reverse_Iterator& DS::Vector<T>::Const_Reverse_Iterator::operator=(DS::Vector<T>::Base_Iterator&& rhv)
+{
+    if (this == &rhv)
+        return *this;
+
+    this -> ptr = rhv.ptr;
+    rhv.ptr = nullptr;
+
+    return *this;
+}
+
+template <typename T>
+const T& DS::Vector<T>::Const_Reverse_Iterator::operator*()
+{
+    return *(this -> ptr);
+}
+
+template <typename T>
+const T* DS::Vector<T>::Const_Reverse_Iterator::operator->()
+{
+    return this -> ptr;
+}
+
+template <typename T>
+typename DS::Vector<T>::Const_Reverse_Iterator& DS::Vector<T>::Const_Reverse_Iterator::operator++()
+{
+    --(this -> ptr);
+
+    return *this;
+}
+
+template <typename T>
+typename DS::Vector<T>::Const_Reverse_Iterator& DS::Vector<T>::Const_Reverse_Iterator::operator++(int)
+{
+    DS::Vector<T>::Const_Reverse_Iterator temp = *this;
+    --(this -> ptr);
+
+    return temp;
+}
+
+template <typename T>
+typename DS::Vector<T>::Const_Reverse_Iterator& DS::Vector<T>::Const_Reverse_Iterator::operator--()
+{
+    ++(this -> ptr);
+
+    return *this;
+}
+
+template <typename T>
+typename DS::Vector<T>::Const_Reverse_Iterator& DS::Vector<T>::Const_Reverse_Iterator::operator--(int)
+{
+    DS::Vector<T>::Const_Reverse_Iterator temp = *this;
+    ++(this -> ptr);
+
+    return temp;
+}
+
+template <typename T>
+const typename DS::Vector<T>::Const_Reverse_Iterator DS::Vector<T>::Const_Reverse_Iterator::operator+(long long int arg) const
+{
+    const DS::Vector<T>::Const_Reverse_Iterator temp = (this -> ptr) - arg;
+
+    return temp;
+}
+
+template <typename T>
+const typename DS::Vector<T>::Const_Reverse_Iterator DS::Vector<T>::Const_Reverse_Iterator::operator-(long long int arg) const
+{
+    const DS::Vector<T>::Const_Reverse_Iterator temp = (this -> ptr) + arg;
+
+    return temp;
+}
+
+template <typename T>
+typename DS::Vector<T>::Const_Reverse_Iterator& DS::Vector<T>::Const_Reverse_Iterator::operator+=(long long int arg)
+{
+    this -> ptr -= arg;
+
+    return *this;
+}
+
+template <typename T>
+typename DS::Vector<T>::Const_Reverse_Iterator& DS::Vector<T>::Const_Reverse_Iterator::operator-=(long long int arg)
+{
+    this -> ptr += arg;
+
+    return *this;
+}
+
+template <typename T>
+const T& DS::Vector<T>::Const_Reverse_Iterator::operator[](std::size_t index) const
+{
+    return this -> ptr[index];
+}
+
+template <typename T>
+DS::Vector<T>::Reverse_Iterator::Reverse_Iterator(T* p)
+                    : DS::Vector<T>::Const_Reverse_Iterator(p)
+{
+
+}
+
+template <typename T>
+DS::Vector<T>::Reverse_Iterator::Reverse_Iterator()
+                    : DS::Vector<T>::Const_Reverse_Iterator(nullptr)
+{
+
+}
+
+template <typename T>
+DS::Vector<T>::Reverse_Iterator::Reverse_Iterator(const DS::Vector<T>::Base_Iterator& rhv)
+                    : DS::Vector<T>::Const_Reverse_Iterator(rhv.ptr)
+{
+
+}
+
+template <typename T>
+DS::Vector<T>::Reverse_Iterator::Reverse_Iterator(DS::Vector<T>::Base_Iterator&& rhv)
+                    : DS::Vector<T>::Const_Reverse_Iterator(rhv.ptr)
+{
+    rhv.ptr = nullptr;
+}
+
+template <typename T>
+const typename DS::Vector<T>::Reverse_Iterator& DS::Vector<T>::Reverse_Iterator::operator=(const DS::Vector<T>::Base_Iterator& rhv)
+{
+    this -> ptr = rhv.ptr;
+
+    return *this;
+}
+
+template <typename T>
+const typename DS::Vector<T>::Reverse_Iterator& DS::Vector<T>::Reverse_Iterator::operator=(DS::Vector<T>::Base_Iterator&& rhv)
+{
+    this -> ptr = rhv.ptr;
+    rhv.ptr = nullptr;
+
+    return *this;
+}
+
+template <typename T>
+T& DS::Vector<T>::Reverse_Iterator::operator*()
+{
+    return *(this -> ptr);
+}
+
+template <typename T>
+T* DS::Vector<T>::Reverse_Iterator::operator->()
+{
+    return this -> ptr;
+}
+
+template <typename T>
+T& DS::Vector<T>::Reverse_Iterator::operator[](std::size_t index)
+{
+    return this -> ptr[index];
+}
+
 template <typename T>
 DS::Vector<T>::Vector()
             : m_size(0)

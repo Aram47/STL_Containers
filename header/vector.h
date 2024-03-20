@@ -14,22 +14,44 @@ private:
   std::size_t m_capacity;
   T* m_array;
 
+private:
+
+  class Base_Iterator
+  {
+    friend class Vector<T>;
+  private:
+    T* ptr = nullptr;
+  public:
+    ~Base_Iterator();
+    bool operator<(const Base_Iterator& rhv) const;
+    bool operator>(const Base_Iterator& rhv) const;
+    bool operator<=(const Base_Iterator& rhv) const;
+    bool operator>=(const Base_Iterator& rhv) const;
+    bool operator==(const Base_Iterator& rhv) const;
+    bool operator!=(const Base_Iterator& rhv) const;
+
+    const Base_Iterator& operator=(const Base_Iterator&);
+    const Base_Iterator& operator=(Base_Iterator&&);
+
+  protected:
+    explicit Base_Iterator(T*);
+  };
+
 public:
 
-  class Const_Iterator
+  class Const_Iterator : public Base_Iterator
   {
-    friend class Vector;
-  private:
-    T* ptr;
+    friend class Vector<T>;
+  
   protected:
-    explicit Const_Iterator(const T* p) : ptr(p) {};
+    explicit Const_Iterator(T*);
   public:
-    Const_Iterator() : ptr(nullptr) {};
-    Const_Iterator(const Const_Iterator& other);
-    Const_Iterator(Const_Iterator&& other);
+    Const_Iterator();
+    Const_Iterator(const Base_Iterator&);
+    Const_Iterator(Base_Iterator&&);
 
-    const Const_Iterator& operator=(const Const_Iterator&);
-    const Const_Iterator& operator=(const Const_Iterator&);
+    const Const_Iterator& operator=(const Base_Iterator&);
+    const Const_Iterator& operator=(Base_Iterator&&);
 
     const T& operator*(); // return *ptr
     const T* operator->(); // return ptr
@@ -37,47 +59,75 @@ public:
     Const_Iterator& operator++(int); // return temp
     Const_Iterator& operator--();
     Const_Iterator& operator--(int);
-    const Const_Iterator operator+() const;
-    const Const_Iterator operator-() const;
-    Const_Iterator& operator+=(const Const_Iterator&);
-    Const_Iterator& operator-=(const Const_Iterator&);
-    const Const_Iterator& operator[](std::size_t) const;
-    bool operator<(const Const_Iterator& rhv) const; // this->ptr < rhv.ptr
-    bool operator>(const Const_Iterator& rhv) const; // this->ptr > rhv.ptr
-    bool operator<=(const Const_Iterator& rhv) const; // this->ptr <= rhv.ptr
-    bool operator>=(const Const_Iterator& rhv) const; // this->ptr >= rhv.ptr
-    bool operator==(const Const_Iterator& rhv) const; // this->ptr == rhv.ptr
-    bool operator!=(const Const_Iterator& rhv) const; // !(*this == rhv)
+    const Const_Iterator operator+(long long int) const;
+    const Const_Iterator operator-(long long int) const;
+    Const_Iterator& operator+=(long long int);
+    Const_Iterator& operator-=(long long int);
+    const T& operator[](std::size_t) const;
   };
 
   class Iterator : public Const_Iterator
   {
+    friend class Vector<T>;
   public:
-    Iterator(const Const_Iterator& rhv);
-    Iterator(const Const_Iterator& rhv);
+    Iterator();
+    Iterator(const Base_Iterator& rhv);
+    Iterator(Base_Iterator&& rhv);
+
+    const Iterator& operator=(const Base_Iterator&);
+    const Iterator& operator=(Base_Iterator&&);
 
     T& operator*();
     T* operator->();
-
-    const Iterator& operator=(const Const_Iterator& rhv); //O(1)
-    const Iterator& operator=(Const_Iterator&& rhv);
-    explicit Iterator(T* ptr);
-    //def constr
-    // param constr delegate const_iter param constructor
-    // copy ctor
-    // move ctor
-    // non assignments operators (copy, move)
-    //[], ->, *, 
+    T& operator[](std::size_t);
+  protected:
+    explicit Iterator(T*);
   };
 
-  class Const_Reverse_Iterator 
+  class Const_Reverse_Iterator : public Base_Iterator
   {
+    friend class Vector<T>;
+  
+  protected:
+    explicit Const_Reverse_Iterator(T*);
+  public:
+    Const_Reverse_Iterator();
+    Const_Reverse_Iterator(const Base_Iterator&);
+    Const_Reverse_Iterator(Base_Iterator&&);
 
+    const Const_Reverse_Iterator& operator=(const Base_Iterator&);
+    const Const_Reverse_Iterator& operator=(Base_Iterator&&);
+
+    const T& operator*(); // return *ptr
+    const T* operator->(); // return ptr
+
+    Const_Reverse_Iterator& operator++();
+    Const_Reverse_Iterator& operator++(int); // return temp
+    Const_Reverse_Iterator& operator--();
+    Const_Reverse_Iterator& operator--(int);
+    const Const_Reverse_Iterator operator+(long long int) const;
+    const Const_Reverse_Iterator operator-(long long int) const;
+    Const_Reverse_Iterator& operator+=(long long int);
+    Const_Reverse_Iterator& operator-=(long long int);
+    const T& operator[](std::size_t) const;
   };
 
   class Reverse_Iterator : public Const_Reverse_Iterator
   {
+    friend class Vector<T>;
+  public:
+    Reverse_Iterator();
+    Reverse_Iterator(const Base_Iterator& rhv);
+    Reverse_Iterator(Base_Iterator&& rhv);
 
+    const Reverse_Iterator& operator=(const Base_Iterator&);
+    const Reverse_Iterator& operator=(Base_Iterator&&);
+
+    T& operator*();
+    T* operator->();
+    T& operator[](std::size_t);
+  protected:
+    explicit Reverse_Iterator(T* ptr);
   };
 
   // Constructors
@@ -121,16 +171,12 @@ public:
 
   // Iterators
   Iterator begin() noexcept;
-  Const_Iterator begin() const noexcept;
   Const_Iterator cbegin() const noexcept;
   Iterator end() noexcept;
-  Const_Iterator end() const noexcept;
   Const_Iterator cend() const noexcept;
   Reverse_Iterator rbegin() noexcept;
-  Const_Reverse_Iterator rbegin() const noexcept;
   Const_Reverse_Iterator crbegin() const noexcept;
   Reverse_Iterator rend() noexcept;
-  Const_Reverse_Iterator rend() const noexcept;
   Const_Reverse_Iterator crend() const noexcept;
 
   // Capacity
