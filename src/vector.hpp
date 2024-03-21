@@ -3,7 +3,7 @@
 #include <iostream>
 #include <initializer_list>
 #include <stdexcept>
-
+#include <unistd.h> 
 
 template <typename T>
 DS::Vector<T>::Base_Iterator::Base_Iterator(T* p)
@@ -15,9 +15,6 @@ DS::Vector<T>::Base_Iterator::Base_Iterator(T* p)
 template <typename T>
 DS::Vector<T>::Base_Iterator::~Base_Iterator()
 {
-    if (this -> ptr)
-        delete this -> ptr;
-
     this -> ptr = nullptr;
 }
 
@@ -144,30 +141,34 @@ const T* DS::Vector<T>::Const_Iterator::operator->()
 }
 
 template <typename T>
-typename DS::Vector<T>::Const_Iterator& DS::Vector<T>::Const_Iterator::operator++()
+const  typename DS::Vector<T>::Const_Iterator& DS::Vector<T>::Const_Iterator::operator++()
 {
-    return ++(this -> ptr);
+    ++(this -> ptr);
+
+    return *this;
 }
 
 template <typename T>
-typename DS::Vector<T>::Const_Iterator& DS::Vector<T>::Const_Iterator::operator++(int) // return temp
+const typename DS::Vector<T>::Const_Iterator& DS::Vector<T>::Const_Iterator::operator++(int)
 {
-    DS::Vector<T>::Const_Iterator temp = *this;
+    const DS::Vector<T>::Const_Iterator& temp = *this;
     ++(this -> ptr);
 
     return temp;
 }
 
 template <typename T>
-typename DS::Vector<T>::Const_Iterator& DS::Vector<T>::Const_Iterator::operator--()
+const typename DS::Vector<T>::Const_Iterator& DS::Vector<T>::Const_Iterator::operator--()
 {
-    return --(this -> ptr);
+    --(this -> ptr);
+
+    return *this;
 }
 
 template <typename T>
-typename DS::Vector<T>::Const_Iterator& DS::Vector<T>::Const_Iterator::operator--(int)
+const typename DS::Vector<T>::Const_Iterator& DS::Vector<T>::Const_Iterator::operator--(int)
 {
-    DS::Vector<T>::Const_Iterator temp = *this;
+    const DS::Vector<T>::Const_Iterator& temp = *this;
     --(this -> ptr);
 
     return temp;
@@ -176,21 +177,17 @@ typename DS::Vector<T>::Const_Iterator& DS::Vector<T>::Const_Iterator::operator-
 template <typename T>
 const typename DS::Vector<T>::Const_Iterator DS::Vector<T>::Const_Iterator::operator+(long long int arg) const
 {
-    const DS::Vector<T>::Const_Iterator temp = (this -> ptr) + arg;
-
-    return temp;
+    return DS::Vector<T>::Const_Iterator((this -> ptr) + arg);
 }
 
 template <typename T>
 const typename DS::Vector<T>::Const_Iterator DS::Vector<T>::Const_Iterator::operator-(long long int arg) const
 {
-    const DS::Vector<T>::Const_Iterator temp = (this -> ptr) - arg;
-
-    return temp;
+    return DS::Vector<T>::Const_Iterator((this -> ptr) - arg);
 }
 
 template <typename T>
-typename DS::Vector<T>::Const_Iterator& DS::Vector<T>::Const_Iterator::operator+=(long long int arg)
+const typename DS::Vector<T>::Const_Iterator& DS::Vector<T>::Const_Iterator::operator+=(long long int arg)
 {
     this -> ptr += arg;
 
@@ -198,7 +195,7 @@ typename DS::Vector<T>::Const_Iterator& DS::Vector<T>::Const_Iterator::operator+
 }
 
 template <typename T>
-typename DS::Vector<T>::Const_Iterator& DS::Vector<T>::Const_Iterator::operator-=(long long int arg)
+const typename DS::Vector<T>::Const_Iterator& DS::Vector<T>::Const_Iterator::operator-=(long long int arg)
 {
     this -> ptr -= arg;
 
@@ -275,6 +272,68 @@ T* DS::Vector<T>::Iterator::operator->()
 }
 
 template <typename T>
+typename DS::Vector<T>::Iterator& DS::Vector<T>::Iterator::operator++()
+{
+    ++(this -> ptr);
+
+    return *this;
+}
+
+template <typename T>
+typename DS::Vector<T>::Iterator& DS::Vector<T>::Iterator::operator++(int)
+{
+    DS::Vector<T>::Iterator& temp = *this;
+    ++(this -> ptr);
+
+    return temp;
+}
+
+template <typename T>
+typename DS::Vector<T>::Iterator& DS::Vector<T>::Iterator::operator--()
+{
+    --(this -> ptr);
+
+    return *this;
+}
+
+template <typename T>
+typename DS::Vector<T>::Iterator& DS::Vector<T>::Iterator::operator--(int)
+{
+    DS::Vector<T>::Iterator& temp = *this;
+    --(this -> ptr);
+
+    return temp;
+}
+
+template <typename T>
+typename DS::Vector<T>::Iterator DS::Vector<T>::Iterator::operator+(long long int arg) const
+{   
+    return DS::Vector<T>::Iterator((this -> ptr) + arg);
+}
+
+template <typename T>
+typename DS::Vector<T>::Iterator DS::Vector<T>::Iterator::operator-(long long int arg) const
+{
+    return DS::Vector<T>::Iterator((this -> ptr) - arg);
+}
+
+template <typename T>
+typename DS::Vector<T>::Iterator& DS::Vector<T>::Iterator::operator+=(long long int arg)
+{
+    this -> ptr += arg;
+
+    return *this;
+}
+
+template <typename T>
+typename DS::Vector<T>::Iterator& DS::Vector<T>::Iterator::operator-=(long long int arg)
+{
+    this -> ptr -= arg;
+
+    return *this;
+}
+
+template <typename T>
 T& DS::Vector<T>::Iterator::operator[](std::size_t index)
 {
     return this -> ptr[index];
@@ -344,7 +403,7 @@ const T* DS::Vector<T>::Const_Reverse_Iterator::operator->()
 }
 
 template <typename T>
-typename DS::Vector<T>::Const_Reverse_Iterator& DS::Vector<T>::Const_Reverse_Iterator::operator++()
+const typename DS::Vector<T>::Const_Reverse_Iterator& DS::Vector<T>::Const_Reverse_Iterator::operator++()
 {
     --(this -> ptr);
 
@@ -352,16 +411,16 @@ typename DS::Vector<T>::Const_Reverse_Iterator& DS::Vector<T>::Const_Reverse_Ite
 }
 
 template <typename T>
-typename DS::Vector<T>::Const_Reverse_Iterator& DS::Vector<T>::Const_Reverse_Iterator::operator++(int)
+const typename DS::Vector<T>::Const_Reverse_Iterator& DS::Vector<T>::Const_Reverse_Iterator::operator++(int)
 {
-    DS::Vector<T>::Const_Reverse_Iterator temp = *this;
+    DS::Vector<T>::Const_Reverse_Iterator& temp = *this;
     --(this -> ptr);
 
     return temp;
 }
 
 template <typename T>
-typename DS::Vector<T>::Const_Reverse_Iterator& DS::Vector<T>::Const_Reverse_Iterator::operator--()
+const typename DS::Vector<T>::Const_Reverse_Iterator& DS::Vector<T>::Const_Reverse_Iterator::operator--()
 {
     ++(this -> ptr);
 
@@ -369,9 +428,9 @@ typename DS::Vector<T>::Const_Reverse_Iterator& DS::Vector<T>::Const_Reverse_Ite
 }
 
 template <typename T>
-typename DS::Vector<T>::Const_Reverse_Iterator& DS::Vector<T>::Const_Reverse_Iterator::operator--(int)
+const typename DS::Vector<T>::Const_Reverse_Iterator& DS::Vector<T>::Const_Reverse_Iterator::operator--(int)
 {
-    DS::Vector<T>::Const_Reverse_Iterator temp = *this;
+    const DS::Vector<T>::Const_Reverse_Iterator& temp = *this;
     ++(this -> ptr);
 
     return temp;
@@ -380,21 +439,17 @@ typename DS::Vector<T>::Const_Reverse_Iterator& DS::Vector<T>::Const_Reverse_Ite
 template <typename T>
 const typename DS::Vector<T>::Const_Reverse_Iterator DS::Vector<T>::Const_Reverse_Iterator::operator+(long long int arg) const
 {
-    const DS::Vector<T>::Const_Reverse_Iterator temp = (this -> ptr) - arg;
-
-    return temp;
+    return DS::Vector<T>::Const_Reverse_Iterator((this -> ptr) - arg);
 }
 
 template <typename T>
 const typename DS::Vector<T>::Const_Reverse_Iterator DS::Vector<T>::Const_Reverse_Iterator::operator-(long long int arg) const
 {
-    const DS::Vector<T>::Const_Reverse_Iterator temp = (this -> ptr) + arg;
-
-    return temp;
+    return DS::Vector<T>::Const_Reverse_Iterator((this -> ptr) + arg);
 }
 
 template <typename T>
-typename DS::Vector<T>::Const_Reverse_Iterator& DS::Vector<T>::Const_Reverse_Iterator::operator+=(long long int arg)
+const typename DS::Vector<T>::Const_Reverse_Iterator& DS::Vector<T>::Const_Reverse_Iterator::operator+=(long long int arg)
 {
     this -> ptr -= arg;
 
@@ -402,7 +457,7 @@ typename DS::Vector<T>::Const_Reverse_Iterator& DS::Vector<T>::Const_Reverse_Ite
 }
 
 template <typename T>
-typename DS::Vector<T>::Const_Reverse_Iterator& DS::Vector<T>::Const_Reverse_Iterator::operator-=(long long int arg)
+const typename DS::Vector<T>::Const_Reverse_Iterator& DS::Vector<T>::Const_Reverse_Iterator::operator-=(long long int arg)
 {
     this -> ptr += arg;
 
@@ -470,6 +525,68 @@ template <typename T>
 T* DS::Vector<T>::Reverse_Iterator::operator->()
 {
     return this -> ptr;
+}
+
+template <typename T>
+typename DS::Vector<T>::Reverse_Iterator& DS::Vector<T>::Reverse_Iterator::operator++()
+{
+    --(this -> ptr);
+
+    return *this;
+}
+
+template <typename T>
+typename DS::Vector<T>::Reverse_Iterator& DS::Vector<T>::Reverse_Iterator::operator++(int)
+{
+    DS::Vector<T>::Reverse_Iterator& temp = *this;
+    --(this -> ptr);
+
+    return temp;
+}
+
+template <typename T>
+typename DS::Vector<T>::Reverse_Iterator& DS::Vector<T>::Reverse_Iterator::operator--()
+{
+    ++(this -> ptr);
+
+    return *this;
+}
+
+template <typename T>
+typename DS::Vector<T>::Reverse_Iterator& DS::Vector<T>::Reverse_Iterator::operator--(int)
+{
+    DS::Vector<T>::Reverse_Iterator& temp = *this;
+    ++(this -> ptr);
+
+    return temp;
+}
+
+template <typename T>
+typename DS::Vector<T>::Reverse_Iterator DS::Vector<T>::Reverse_Iterator::operator+(long long int arg) const
+{
+    return DS::Vector<T>::Const_Reverse_Iterator((this -> ptr) - arg);
+}
+
+template <typename T>
+typename DS::Vector<T>::Reverse_Iterator DS::Vector<T>::Reverse_Iterator::operator-(long long int arg) const
+{
+    return DS::Vector<T>::Const_Reverse_Iterator((this -> ptr) + arg);
+}
+
+template <typename T>
+typename DS::Vector<T>::Reverse_Iterator& DS::Vector<T>::Reverse_Iterator::operator+=(long long int arg)
+{
+    this -> ptr -= arg;
+
+    return *this;
+}
+
+template <typename T>
+typename DS::Vector<T>::Reverse_Iterator& DS::Vector<T>::Reverse_Iterator::operator-=(long long int arg)
+{
+    this -> ptr += arg;
+
+    return *this;
 }
 
 template <typename T>
@@ -547,8 +664,8 @@ DS::Vector<T>::Vector(int count, const T& value)
 template <typename T>
 DS::Vector<T>::~Vector()
 {
-    if (this -> m_array)
-        delete [] this -> m_array;
+    if (m_array)
+        delete [] m_array;
 
     this -> m_size = 0;
     this -> m_capacity = 0;
@@ -576,7 +693,7 @@ DS::Vector<T>& DS::Vector<T>::operator=(const Vector<T>& other)
 template <typename T>
 DS::Vector<T>& DS::Vector<T>::operator=(Vector&& other) noexcept
 {
-    if (this == other)
+    if (this == &other)
         return *this;
 
     DS::Vector<T>::clear();
@@ -713,7 +830,7 @@ const T* DS::Vector<T>::data() const noexcept
 template <typename T>
 bool DS::Vector<T>::empty() const noexcept
 {
-    return !(this -> m_size);
+    return !(this -> m_array);
 }
 
 template <typename T>
@@ -725,9 +842,13 @@ std::size_t DS::Vector<T>::size() const noexcept
 template <typename T>
 std::size_t DS::Vector<T>::max_size() const noexcept
 {
-    std::size_t max = -1;
+    std::size_t elem_size = sizeof(T);
+    std::size_t max_bytes, max_elements;
 
-    return max;
+    max_bytes = sysconf(_SC_PHYS_PAGES) * sysconf(_SC_PAGESIZE);
+    max_elements = max_bytes / elem_size;
+
+    return max_elements;
 }
 
 template <typename T>
@@ -889,4 +1010,168 @@ void DS::Vector<T>::swap(Vector& other)
     other.m_size = tempSize;
     other.m_capacity = tempCapacity;
     other.m_array = tempArray;
+}
+
+template <typename T>
+typename DS::Vector<T>::Iterator DS::Vector<T>::begin() noexcept
+{
+    return DS::Vector<T>::Iterator(this -> m_array);
+}
+
+template <typename T>
+typename DS::Vector<T>::Const_Iterator DS::Vector<T>::cbegin() const noexcept
+{
+    return DS::Vector<T>::Const_Iterator(this -> m_array);
+}
+
+template <typename T>
+typename DS::Vector<T>::Iterator DS::Vector<T>::end() noexcept
+{
+    return DS::Vector<T>::Iterator(this -> m_array + DS::Vector<T>::size());
+}
+
+template <typename T>
+typename DS::Vector<T>::Const_Iterator DS::Vector<T>::cend() const noexcept
+{
+    return DS::Vector<T>::Iterator(this -> m_array + DS::Vector<T>::size());
+}
+
+template <typename T>
+typename DS::Vector<T>::Reverse_Iterator DS::Vector<T>::rbegin() noexcept
+{
+    return DS::Vector<T>::Reverse_Iterator(this -> m_array + DS::Vector<T>::size() - 1);
+}
+
+template <typename T>
+typename DS::Vector<T>::Const_Reverse_Iterator DS::Vector<T>::crbegin() const noexcept
+{
+    return DS::Vector<T>::Const_Reverse_Iterator(this -> m_array + DS::Vector<T>::size() - 1);
+}
+
+template <typename T>
+typename DS::Vector<T>::Reverse_Iterator DS::Vector<T>::rend() noexcept
+{
+    return DS::Vector<T>::Reverse_Iterator(this -> m_array - 1);
+}
+
+template <typename T>
+typename DS::Vector<T>::Const_Reverse_Iterator DS::Vector<T>::crend() const noexcept
+{
+    return DS::Vector<T>::Const_Reverse_Iterator(this -> m_array - 1);
+}
+
+template <typename T>
+typename DS::Vector<T>::Iterator DS::Vector<T>::insert(const DS::Vector<T>::Base_Iterator& pos, const T& value)
+{
+    std::size_t index = pos.ptr - m_array;
+
+    if (index < 0 || index >= DS::Vector<T>::size())
+        throw std::out_of_range("Invalid address");
+
+    if (m_size == m_capacity)
+        DS::Vector<T>::reserve(m_capacity * 2);
+
+    for (std::size_t i = m_size; i > index; --i)
+        m_array[i] = std::move(m_array[i - 1]);
+
+    m_array[index] = value;
+    ++m_size;
+
+    return DS::Vector<T>::Iterator(m_array + index);
+}
+
+template <typename T>
+typename DS::Vector<T>::Iterator DS::Vector<T>::insert(const DS::Vector<T>::Base_Iterator& pos, int count, const T& value)
+{
+    std::size_t index = pos.ptr - m_array;
+
+    if (index < 0 || index >= DS::Vector<T>::size())
+        throw std::out_of_range("Invalid address");
+
+    std::size_t oldSize = m_size;
+
+    m_size += count;
+
+    if (m_size > m_capacity)
+        DS::Vector<T>::reserve(m_size * 2);
+
+    for (std::size_t i = oldSize + count - 1; i >= index + count; --i)
+        m_array[i] = std::move(m_array[i - count]);
+
+    for (std::size_t i = index; i < index + count; ++i)
+        m_array[i] = value;
+
+    return DS::Vector<T>::Iterator(m_array + index);
+}
+
+template <typename T>
+typename DS::Vector<T>::Iterator DS::Vector<T>::insert(const DS::Vector<T>::Base_Iterator& pos, const Base_Iterator& first, const Base_Iterator& last)
+{
+    std::size_t index = pos.ptr - m_array;
+
+    std::size_t count = last.ptr - first.ptr + 1;
+
+    if (m_size + count > m_capacity)
+        DS::Vector<T>::reserve(m_size + count);
+
+    for (std::size_t i = m_size + count - 1; i >= index + count; --i)
+        m_array[i] = std::move(m_array[i - count]);
+
+    std::size_t i = index;
+
+    for (Base_Iterator it = first; it != last; ++it)
+        m_array[i++] = *it;
+
+    m_size += count;
+
+    return DS::Vector<T>::Iterator(m_array + index);
+}
+
+template <typename T>
+typename DS::Vector<T>::Iterator DS::Vector<T>::insert(const DS::Vector<T>::Base_Iterator& pos, std::initializer_list<T> list)
+{
+    std::size_t index = pos.ptr - m_array;
+    std::size_t count = list.size();
+    std::size_t oldSize = m_size;
+
+    m_size += count;
+    if (m_size > m_capacity)
+        DS::Vector<T>::reserve(m_size * 2);
+
+    for (std::size_t i = oldSize + count - 1; i >= index + count; --i)
+        m_array[i] = std::move(m_array[i - count]);
+
+    for (const auto& elem : list)
+        m_array[index++] = elem;
+
+    return DS::Vector<T>::Iterator(m_array + index - count);
+}
+
+template <typename T>
+typename DS::Vector<T>::Iterator DS::Vector<T>::erase(const DS::Vector<T>::Base_Iterator& pos)
+{
+    std::size_t index = pos.ptr - m_array;
+
+    for (std::size_t i = index; i < m_size - 1; ++i)
+        m_array[i] = std::move(m_array[i + 1]);
+
+    --m_size;
+
+    return DS::Vector<T>::Iterator(m_array + index);
+}
+
+template <typename T>
+typename DS::Vector<T>::Iterator DS::Vector<T>::erase(const DS::Vector<T>::Base_Iterator& first, const DS::Vector<T>::Base_Iterator& last)
+{
+    std::size_t firstIndex = first.ptr - m_array;
+    std::size_t lastIndex = last.ptr - m_array;
+
+    std::size_t shift = lastIndex - firstIndex + 1;
+
+    for (std::size_t i = firstIndex; i < m_size - shift; ++i)
+        m_array[i] = std::move(m_array[i + shift]);
+
+    m_size -= shift;
+
+    return DS::Vector<T>::Iterator(m_array + firstIndex);
 }

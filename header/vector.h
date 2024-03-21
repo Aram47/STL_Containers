@@ -4,6 +4,7 @@
 #include <iostream>
 #include <initializer_list>
 #include <stdexcept>
+#include <unistd.h> 
 
 namespace DS {
 
@@ -23,12 +24,12 @@ private:
     T* ptr = nullptr;
   public:
     ~Base_Iterator();
-    bool operator<(const Base_Iterator& rhv) const;
-    bool operator>(const Base_Iterator& rhv) const;
-    bool operator<=(const Base_Iterator& rhv) const;
-    bool operator>=(const Base_Iterator& rhv) const;
-    bool operator==(const Base_Iterator& rhv) const;
-    bool operator!=(const Base_Iterator& rhv) const;
+    bool operator<(const Base_Iterator&) const;
+    bool operator>(const Base_Iterator&) const;
+    bool operator<=(const Base_Iterator&) const;
+    bool operator>=(const Base_Iterator&) const;
+    bool operator==(const Base_Iterator&) const;
+    bool operator!=(const Base_Iterator&) const;
 
     const Base_Iterator& operator=(const Base_Iterator&);
     const Base_Iterator& operator=(Base_Iterator&&);
@@ -53,16 +54,16 @@ public:
     const Const_Iterator& operator=(const Base_Iterator&);
     const Const_Iterator& operator=(Base_Iterator&&);
 
-    const T& operator*(); // return *ptr
-    const T* operator->(); // return ptr
-    Const_Iterator& operator++();
-    Const_Iterator& operator++(int); // return temp
-    Const_Iterator& operator--();
-    Const_Iterator& operator--(int);
+    const T& operator*();
+    const T* operator->();
+    const Const_Iterator& operator++();
+    const Const_Iterator& operator++(int);
+    const Const_Iterator& operator--();
+    const Const_Iterator& operator--(int);
     const Const_Iterator operator+(long long int) const;
     const Const_Iterator operator-(long long int) const;
-    Const_Iterator& operator+=(long long int);
-    Const_Iterator& operator-=(long long int);
+    const Const_Iterator& operator+=(long long int);
+    const Const_Iterator& operator-=(long long int);
     const T& operator[](std::size_t) const;
   };
 
@@ -71,14 +72,24 @@ public:
     friend class Vector<T>;
   public:
     Iterator();
-    Iterator(const Base_Iterator& rhv);
-    Iterator(Base_Iterator&& rhv);
+    Iterator(const Base_Iterator&);
+    Iterator(Base_Iterator&&);
 
     const Iterator& operator=(const Base_Iterator&);
     const Iterator& operator=(Base_Iterator&&);
 
     T& operator*();
     T* operator->();
+
+    Iterator& operator++();
+    Iterator& operator++(int);
+    Iterator& operator--();
+    Iterator& operator--(int);
+    Iterator operator+(long long int) const;
+    Iterator operator-(long long int) const;
+    Iterator& operator+=(long long int);
+    Iterator& operator-=(long long int);
+
     T& operator[](std::size_t);
   protected:
     explicit Iterator(T*);
@@ -98,17 +109,17 @@ public:
     const Const_Reverse_Iterator& operator=(const Base_Iterator&);
     const Const_Reverse_Iterator& operator=(Base_Iterator&&);
 
-    const T& operator*(); // return *ptr
-    const T* operator->(); // return ptr
+    const T& operator*();
+    const T* operator->();
 
-    Const_Reverse_Iterator& operator++();
-    Const_Reverse_Iterator& operator++(int); // return temp
-    Const_Reverse_Iterator& operator--();
-    Const_Reverse_Iterator& operator--(int);
+    const Const_Reverse_Iterator& operator++();
+    const Const_Reverse_Iterator& operator++(int);
+    const Const_Reverse_Iterator& operator--();
+    const Const_Reverse_Iterator& operator--(int);
     const Const_Reverse_Iterator operator+(long long int) const;
     const Const_Reverse_Iterator operator-(long long int) const;
-    Const_Reverse_Iterator& operator+=(long long int);
-    Const_Reverse_Iterator& operator-=(long long int);
+    const Const_Reverse_Iterator& operator+=(long long int);
+    const Const_Reverse_Iterator& operator-=(long long int);
     const T& operator[](std::size_t) const;
   };
 
@@ -117,51 +128,58 @@ public:
     friend class Vector<T>;
   public:
     Reverse_Iterator();
-    Reverse_Iterator(const Base_Iterator& rhv);
-    Reverse_Iterator(Base_Iterator&& rhv);
+    Reverse_Iterator(const Base_Iterator&);
+    Reverse_Iterator(Base_Iterator&&);
 
     const Reverse_Iterator& operator=(const Base_Iterator&);
     const Reverse_Iterator& operator=(Base_Iterator&&);
 
     T& operator*();
     T* operator->();
+
+    Reverse_Iterator& operator++();
+    Reverse_Iterator& operator++(int);
+    Reverse_Iterator& operator--();
+    Reverse_Iterator& operator--(int);
+    Reverse_Iterator operator+(long long int) const;
+    Reverse_Iterator operator-(long long int) const;
+    Reverse_Iterator& operator+=(long long int);
+    Reverse_Iterator& operator-=(long long int);
+
     T& operator[](std::size_t);
   protected:
-    explicit Reverse_Iterator(T* ptr);
+    explicit Reverse_Iterator(T*);
   };
 
   // Constructors
   Vector();
-  Vector(const Vector& other);
-  Vector(Vector&& other) noexcept;
-  Vector(std::initializer_list<T> list);
-  explicit Vector(int count);
-  explicit Vector(int count, const T& value);
+  Vector(const Vector&);
+  Vector(Vector&&) noexcept;
+  Vector(std::initializer_list<T>);
+  explicit Vector(int);
+  explicit Vector(int, const T&);
+
   // Destructor
   ~Vector();
 
   // Assignment operators
-  Vector& operator=(const Vector& other);
-  Vector& operator=(Vector&& other) noexcept;
-  Vector& operator=(std::initializer_list<T> list);
-
-  // Element access
-  Const_Iterator operator[](int index);
-  Const_Iterator operator[](int index) const;
+  Vector& operator=(const Vector&);
+  Vector& operator=(Vector&&) noexcept;
+  Vector& operator=(std::initializer_list<T>);
 
   // Comparison operators
-  bool operator==(const Vector<T>& other) const;
-  bool operator!=(const Vector<T>& other) const;
-  bool operator<(const Vector<T>& other) const;
-  bool operator<=(const Vector<T>& other) const;
-  bool operator>(const Vector<T>& other) const;
-  bool operator>=(const Vector<T>& other) const;
+  bool operator==(const Vector<T>&) const;
+  bool operator!=(const Vector<T>&) const;
+  bool operator<(const Vector<T>&) const;
+  bool operator<=(const Vector<T>&) const;
+  bool operator>(const Vector<T>&) const;
+  bool operator>=(const Vector<T>&) const;
 
   // Element access
-  T& operator[](std::size_t pos);
-  const T& operator[](std::size_t pos) const;
-  T& at(int pos);
-  const T& at(int pos) const;
+  T& operator[](std::size_t);
+  const T& operator[](std::size_t) const;
+  T& at(int);
+  const T& at(int) const;
   T& front();
   const T& front() const;
   T& back();
@@ -183,28 +201,24 @@ public:
   bool empty() const noexcept;
   std::size_t size() const noexcept;
   std::size_t max_size() const noexcept;
-  void reserve(std::size_t new_cap);
+  void reserve(std::size_t);
   std::size_t capacity() const noexcept;
   void shrink_to_fit() noexcept;
 
   // Modifiers
   void clear() noexcept;
-  Iterator insert(Const_Iterator pos, const T& value);
-  Iterator insert(Const_Iterator pos, int count, const T& value);
-  Iterator insert(Const_Iterator pos, int first, int last);
-  Iterator insert(Const_Iterator pos, std::initializer_list<T> list);
-  template<typename... Args>
-  Iterator emplace(Const_Iterator pos, Args&&... args);
-  Iterator erase(Const_Iterator pos);
-  Iterator erase(Const_Iterator first, Const_Iterator last);
-  void push_back(const T& value);
-  void push_back(T&& value);
-  template<typename... Args>
-  T& emplace_back(Args&&... args);
+  Iterator insert(const Base_Iterator&, const T&);
+  Iterator insert(const Base_Iterator&, int, const T&);
+  Iterator insert(const Base_Iterator&, const Base_Iterator&, const Base_Iterator&);
+  Iterator insert(const Base_Iterator&, std::initializer_list<T>);
+  Iterator erase(const Base_Iterator&);
+  Iterator erase(const Base_Iterator&, const Base_Iterator&);
+  void push_back(const T&);
+  void push_back(T&&);
   void pop_back();
-  void resize(std::size_t count);
-  void resize(std::size_t count, const T& value);
-  void swap(Vector& other);
+  void resize(std::size_t);
+  void resize(std::size_t, const T&);
+  void swap(Vector&);
 };
 
 }
