@@ -467,7 +467,7 @@ const typename DS::Vector<T>::Const_Reverse_Iterator& DS::Vector<T>::Const_Rever
 template <typename T>
 const T& DS::Vector<T>::Const_Reverse_Iterator::operator[](std::size_t index) const
 {
-    return this -> ptr[index];
+    return *(this -> ptr - index);
 }
 
 template <typename T>
@@ -592,7 +592,7 @@ typename DS::Vector<T>::Reverse_Iterator& DS::Vector<T>::Reverse_Iterator::opera
 template <typename T>
 T& DS::Vector<T>::Reverse_Iterator::operator[](std::size_t index)
 {
-    return this -> ptr[index];
+    return *(this -> ptr - index);
 }
 
 template <typename T>
@@ -728,37 +728,80 @@ DS::Vector<T>& DS::Vector<T>::operator=(std::initializer_list<T> list)
 template <typename T>
 bool DS::Vector<T>::operator==(const Vector<T>& other) const 
 {
-    return (this -> m_size == other.m_size);
+    if (this -> m_size != other.m_size)
+        return false;
+
+    for (std::size_t i = 0; i < this -> m_size; ++i)
+        if (this -> m_array[i] != other.m_array[i])
+            return false;
+
+    return true;
 }
 
 template <typename T>
 bool DS::Vector<T>::operator!=(const Vector<T>& other) const
 {
-    return (this -> m_size != other.m_size);
+    if (this -> m_size != other.m_size)
+        return true;
+
+    for (std::size_t i = 0; i < this -> m_size; ++i)
+        if (this -> m_array[i] != other.m_array[i])
+            return true;
+
+    return false;
 }
 
 template <typename T>
 bool DS::Vector<T>::operator<(const Vector<T>& other) const
 {
-    return (this -> m_size < other.m_size);
+    if (this -> m_size > other.m_size)
+        return false;
+
+    for (std::size_t i = 0; i < other.m_size; ++i)
+        if (this -> m_array[i] < other.m_array[i])
+            return true;
+
+    return false;
 }
 
 template <typename T>
 bool DS::Vector<T>::operator<=(const Vector<T>& other) const
 {
-    return (this -> m_size <= other.m_size);
+    if (this -> m_size > other.m_size)
+        return false;
+
+    for (std::size_t i = 0; i < this -> m_size; ++i)
+        if (this -> m_array[i] > other.m_array[i])
+            return false;
+    
+    return true;
 }
 
 template <typename T>
 bool DS::Vector<T>::operator>(const Vector<T>& other) const
 {
-    return (this -> m_size > other.m_size);
+    if (this -> m_size > other.m_size)
+        return true;
+
+    for (std::size_t i = 0; i < this -> m_size; ++i)
+        if (this -> m_array[i] < other.m_array[i])
+            return false;
+
+    return true;
+
 }
 
 template <typename T>
 bool DS::Vector<T>::operator>=(const Vector<T>& other) const
 {
-    return (this -> m_size >= other.m_size);
+    if (this -> m_size > other.m_size)
+        return true;
+
+    for (std::size_t i = 0; i < this -> m_size; ++i)
+        if (this -> m_array[i] < other.m_array[i])
+            return false;
+
+    return true;
 }
 
 template <typename T>
@@ -830,7 +873,7 @@ const T* DS::Vector<T>::data() const noexcept
 template <typename T>
 bool DS::Vector<T>::empty() const noexcept
 {
-    return !(this -> m_array);
+    return !(this -> m_size);
 }
 
 template <typename T>
