@@ -2,7 +2,7 @@
 #define DATA_STRUCTURES_H
 
 #include "./vector.h"
-
+#include "./string.h"
 
 
 #endif
