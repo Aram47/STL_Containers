@@ -156,7 +156,7 @@ public:
   Vector(const Vector&);
   Vector(Vector&&) noexcept;
   Vector(std::initializer_list<T>);
-  explicit Vector(int);
+  explicit Vector(std::size_t);
   explicit Vector(int, const T&);
 
   // Destructor

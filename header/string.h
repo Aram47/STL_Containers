@@ -2,6 +2,13 @@
 #define STRING_H
 
 #include <iostream>
+#include <initializer_list>
+#include <stdexcept>
+#include <unistd.h> 
+/*
+    
+*/
+// ------------------------------------------------------------------------------------
 #include <cstddef> // For size_t
 #include <iterator> // For iterators
 
@@ -133,7 +140,7 @@ public:
     static const size_type npos = static_cast<size_type>(-1);
 
 private:
-    std::string m_data;
+    char* m_data = nullptr;
 };
 
 // Non-member function overloads

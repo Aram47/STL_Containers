@@ -637,14 +637,14 @@ DS::Vector<T>::Vector(std::initializer_list<T> list)
 
 
 template <typename T>
-DS::Vector<T>::Vector(int count)
+DS::Vector<T>::Vector(std::size_t count)
 {
-    if (count <= 0)
-        throw std::invalid_argument("");
-
-    this -> m_size = 0;
-    this -> m_capacity = count;
+    this -> m_size = count;
+    this -> m_capacity = this -> m_size;
     this -> m_array = new T[this -> m_capacity];
+
+    for (std::size_t i = 0; i < this -> m_size; ++i)
+        this -> m_array[i] = T{};
 }
 
 template <typename T>
@@ -1076,7 +1076,7 @@ typename DS::Vector<T>::Iterator DS::Vector<T>::end() noexcept
 template <typename T>
 typename DS::Vector<T>::Const_Iterator DS::Vector<T>::cend() const noexcept
 {
-    return DS::Vector<T>::Iterator(this -> m_array + DS::Vector<T>::size());
+    return DS::Vector<T>::Const_Iterator(this -> m_array + DS::Vector<T>::size());
 }
 
 template <typename T>
