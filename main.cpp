@@ -1,7 +1,7 @@
 #include <iostream>
 #include "./header/datastructures.h"
 
-int main()
+int main() 
 {
     return 0;
 }

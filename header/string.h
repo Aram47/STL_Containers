@@ -4,75 +4,192 @@
 #include <iostream>
 #include <initializer_list>
 #include <stdexcept>
-#include <unistd.h> 
-/*
-    
-*/
-// ------------------------------------------------------------------------------------
-#include <cstddef> // For size_t
-#include <iterator> // For iterators
+#include <unistd.h>
 
 namespace DS
 {
 
-
 class String {
 public:
     // Member types
-    using value_type        = char;
     using traits_type       = std::char_traits<char>;
     using allocator_type    = std::allocator<char>;
-    using reference         = char&;
-    using const_reference   = const char&;
-    using pointer           = char*;
-    using const_pointer     = const char*;
-    using iterator          = char*;
-    using const_iterator    = const char*;
-    using reverse_iterator  = std::reverse_iterator<iterator>;
-    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
     using difference_type   = std::ptrdiff_t;
-    using size_type         = std::size_t;
+private:
+    class Base_Iterator
+    {
+        friend class String;
+    private:
+        char* ptr = nullptr;
+    public:
+        ~Base_Iterator();
+        bool operator<(const Base_Iterator&) const;
+        bool operator>(const Base_Iterator&) const;
+        bool operator<=(const Base_Iterator&) const;
+        bool operator>=(const Base_Iterator&) const;
+        bool operator==(const Base_Iterator&) const;
+        bool operator!=(const Base_Iterator&) const;
+
+        const Base_Iterator& operator=(const Base_Iterator&);
+        const Base_Iterator& operator=(Base_Iterator&&);
+
+    protected:
+        explicit Base_Iterator(char*);
+    };
+
+public:
+
+    class Const_Iterator : public Base_Iterator
+    {
+        friend class String;
+    protected:
+        explicit Const_Iterator(char*);
+    public:
+        Const_Iterator();
+        Const_Iterator(const Base_Iterator&);
+        Const_Iterator(Base_Iterator&&);
+
+        const Const_Iterator& operator=(const Base_Iterator&);
+        const Const_Iterator& operator=(Base_Iterator&&);
+
+        const char& operator*();
+        const char* operator->();
+        const Const_Iterator& operator++();
+        const Const_Iterator& operator++(int);
+        const Const_Iterator& operator--();
+        const Const_Iterator& operator--(int);
+        const Const_Iterator operator+(long long int) const;
+        const Const_Iterator operator-(long long int) const;
+        const Const_Iterator& operator+=(long long int);
+        const Const_Iterator& operator-=(long long int);
+        const char& operator[](std::size_t) const;
+    };
+
+    class Iterator : public Const_Iterator
+    {
+        friend class String;
+    public:
+        Iterator();
+        Iterator(const Base_Iterator&);
+        Iterator(Base_Iterator&&);
+
+        const Iterator& operator=(const Base_Iterator&);
+        const Iterator& operator=(Base_Iterator&&);
+
+        char& operator*();
+        char* operator->();
+
+        Iterator& operator++();
+        Iterator& operator++(int);
+        Iterator& operator--();
+        Iterator& operator--(int);
+        Iterator operator+(long long int) const;
+        Iterator operator-(long long int) const;
+        Iterator& operator+=(long long int);
+        Iterator& operator-=(long long int);
+
+        char& operator[](std::size_t);
+    protected:
+        explicit Iterator(char*);
+    };
+
+    class Const_Reverse_Iterator : public Base_Iterator
+    {
+        friend class String;
+  
+    protected:
+        explicit Const_Reverse_Iterator(char*);
+    public:
+        Const_Reverse_Iterator();
+        Const_Reverse_Iterator(const Base_Iterator&);
+        Const_Reverse_Iterator(Base_Iterator&&);
+
+        const Const_Reverse_Iterator& operator=(const Base_Iterator&);
+        const Const_Reverse_Iterator& operator=(Base_Iterator&&);
+
+        const char& operator*();
+        const char* operator->();
+
+        const Const_Reverse_Iterator& operator++();
+        const Const_Reverse_Iterator& operator++(int);
+        const Const_Reverse_Iterator& operator--();
+        const Const_Reverse_Iterator& operator--(int);
+        const Const_Reverse_Iterator operator+(long long int) const;
+        const Const_Reverse_Iterator operator-(long long int) const;
+        const Const_Reverse_Iterator& operator+=(long long int);
+        const Const_Reverse_Iterator& operator-=(long long int);
+        const char& operator[](std::size_t) const;
+    };
+
+    class Reverse_Iterator : public Const_Reverse_Iterator
+    {
+        friend class String;
+    public:
+        Reverse_Iterator();
+        Reverse_Iterator(const Base_Iterator&);
+        Reverse_Iterator(Base_Iterator&&);
+
+        const Reverse_Iterator& operator=(const Base_Iterator&);
+        const Reverse_Iterator& operator=(Base_Iterator&&);
+
+        char& operator*();
+        char* operator->();
+
+        Reverse_Iterator& operator++();
+        Reverse_Iterator& operator++(int);
+        Reverse_Iterator& operator--();
+        Reverse_Iterator& operator--(int);
+        Reverse_Iterator operator+(long long int) const;
+        Reverse_Iterator operator-(long long int) const;
+        Reverse_Iterator& operator+=(long long int);
+        Reverse_Iterator& operator-=(long long int);
+
+        char& operator[](std::size_t);
+    protected:
+        explicit Reverse_Iterator(char*);
+    };
 
     // Member functions
     String();
     explicit String(const char* s);
-    explicit String(const std::string& str);
-    String(const String& other);
-    String(String&& other);
+    explicit String(const String& other);
+    explicit String(String&& other);
     ~String();
 
     String& operator=(const String& other);
+    String& operator=(String&& other);
+    String& operator=(std::initializer_list<char>);
 
     // Iterators
-    iterator begin();
-    iterator end();
-    reverse_iterator rbegin();
-    reverse_iterator rend();
-    const_iterator cbegin() const;
-    const_iterator cend() const;
-    const_reverse_iterator crbegin() const;
-    const_reverse_iterator crend() const;
+    Iterator begin();
+    Iterator end();
+    Reverse_Iterator rbegin();
+    Reverse_Iterator rend();
+    Const_Iterator cbegin() const;
+    Const_Iterator cend() const;
+    Const_Reverse_Iterator crbegin() const;
+    Const_Reverse_Iterator crend() const;
 
     // Capacity
-    size_type size() const;
-    size_type length() const;
-    size_type max_size() const;
-    void resize(size_type n);
-    size_type capacity() const;
-    void reserve(size_type n);
+    std::size_t size() const;
+    std::size_t length() const;
+    std::size_t max_size() const;
+    void resize(std::size_t n);
+    std::size_t capacity() const;
+    void reserve(std::size_t n);
     void clear();
     bool empty() const;
     void shrink_to_fit();
 
     // Element access
-    reference operator[](size_type pos);
-    const_reference operator[](size_type pos) const;
-    reference at(size_type pos);
-    const_reference at(size_type pos) const;
-    reference back();
-    const_reference back() const;
-    reference front();
-    const_reference front() const;
+    char& operator[](std::size_t pos);
+    const char& operator[](std::size_t pos) const;
+    char& at(std::size_t pos);
+    const char& at(std::size_t pos) const;
+    char& back();
+    const char& back() const;
+    char& front();
+    const char& front() const;
 
     // Modifiers
     String& operator+=(const String& str);
@@ -80,22 +197,22 @@ public:
     String& operator+=(char c);
     String& append(const String& str);
     String& append(const char* s);
-    String& append(const char* s, size_type n);
-    String& append(size_type n, char c);
+    String& append(const char* s, std::size_t n);
+    String& append(std::size_t n, char c);
     void push_back(char c);
     String& assign(const String& str);
     String& assign(const char* s);
-    String& assign(const char* s, size_type n);
-    String& assign(size_type n, char c);
-    String& insert(size_type pos, const String& str);
-    String& insert(size_type pos, const char* s);
-    String& insert(size_type pos, const char* s, size_type n);
-    String& insert(size_type pos, size_type n, char c);
-    String& erase(size_type pos = 0, size_type len = npos);
-    String& replace(size_type pos, size_type len, const String& str);
-    String& replace(size_type pos, size_type len, const char* s);
-    String& replace(size_type pos, size_type len, const char* s, size_type n);
-    String& replace(size_type pos, size_type len, size_type n, char c);
+    String& assign(const char* s, std::size_t n);
+    String& assign(std::size_t n, char c);
+    String& insert(std::size_t pos, const String& str);
+    String& insert(std::size_t pos, const char* s);
+    String& insert(std::size_t pos, const char* s, std::size_t n);
+    String& insert(std::size_t pos, std::size_t n, char c);
+    String& erase(std::size_t pos = 0, std::size_t len = npos);
+    String& replace(std::size_t pos, std::size_t len, const String& str);
+    String& replace(std::size_t pos, std::size_t len, const char* s);
+    String& replace(std::size_t pos, std::size_t len, const char* s, std::size_t n);
+    String& replace(std::size_t pos, std::size_t len, std::size_t n, char c);
     void swap(String& other);
     void pop_back();
 
@@ -103,41 +220,41 @@ public:
     const char* c_str() const;
     const char* data() const;
     allocator_type get_allocator() const;
-    size_type copy(char* s, size_type len, size_type pos = 0) const;
-    size_type find(const String& str, size_type pos = 0) const;
-    size_type find(const char* s, size_type pos = 0) const;
-    size_type find(const char* s, size_type pos, size_type n) const;
-    size_type find(char c, size_type pos = 0) const;
-    size_type rfind(const String& str, size_type pos = npos) const;
-    size_type rfind(const char* s, size_type pos = npos) const;
-    size_type rfind(const char* s, size_type pos, size_type n) const;
-    size_type rfind(char c, size_type pos = npos) const;
-    size_type find_first_of(const String& str, size_type pos = 0) const;
-    size_type find_first_of(const char* s, size_type pos = 0) const;
-    size_type find_first_of(const char* s, size_type pos, size_type n) const;
-    size_type find_first_of(char c, size_type pos = 0) const;
-    size_type find_last_of(const String& str, size_type pos = npos) const;
-    size_type find_last_of(const char* s, size_type pos = npos) const;
-    size_type find_last_of(const char* s, size_type pos, size_type n) const;
-    size_type find_last_of(char c, size_type pos = npos) const;
-    size_type find_first_not_of(const String& str, size_type pos = 0) const;
-    size_type find_first_not_of(const char* s, size_type pos = 0) const;
-    size_type find_first_not_of(const char* s, size_type pos, size_type n) const;
-    size_type find_first_not_of(char c, size_type pos = 0) const;
-    size_type find_last_not_of(const String& str, size_type pos = npos) const;
-    size_type find_last_not_of(const char* s, size_type pos = npos) const;
-    size_type find_last_not_of(const char* s, size_type pos, size_type n) const;
-    size_type find_last_not_of(char c, size_type pos = npos) const;
-    String substr(size_type pos = 0, size_type len = npos) const;
+    std::size_t copy(char* s, std::size_t len, std::size_t pos = 0) const;
+    std::size_t find(const String& str, std::size_t pos = 0) const;
+    std::size_t find(const char* s, std::size_t pos = 0) const;
+    std::size_t find(const char* s, std::size_t pos, std::size_t n) const;
+    std::size_t find(char c, std::size_t pos = 0) const;
+    std::size_t rfind(const String& str, std::size_t pos = npos) const;
+    std::size_t rfind(const char* s, std::size_t pos = npos) const;
+    std::size_t rfind(const char* s, std::size_t pos, std::size_t n) const;
+    std::size_t rfind(char c, std::size_t pos = npos) const;
+    std::size_t find_first_of(const String& str, std::size_t pos = 0) const;
+    std::size_t find_first_of(const char* s, std::size_t pos = 0) const;
+    std::size_t find_first_of(const char* s, std::size_t pos, std::size_t n) const;
+    std::size_t find_first_of(char c, std::size_t pos = 0) const;
+    std::size_t find_last_of(const String& str, std::size_t pos = npos) const;
+    std::size_t find_last_of(const char* s, std::size_t pos = npos) const;
+    std::size_t find_last_of(const char* s, std::size_t pos, std::size_t n) const;
+    std::size_t find_last_of(char c, std::size_t pos = npos) const;
+    std::size_t find_first_not_of(const String& str, std::size_t pos = 0) const;
+    std::size_t find_first_not_of(const char* s, std::size_t pos = 0) const;
+    std::size_t find_first_not_of(const char* s, std::size_t pos, std::size_t n) const;
+    std::size_t find_first_not_of(char c, std::size_t pos = 0) const;
+    std::size_t find_last_not_of(const String& str, std::size_t pos = npos) const;
+    std::size_t find_last_not_of(const char* s, std::size_t pos = npos) const;
+    std::size_t find_last_not_of(const char* s, std::size_t pos, std::size_t n) const;
+    std::size_t find_last_not_of(char c, std::size_t pos = npos) const;
+    String substr(std::size_t pos = 0, std::size_t len = npos) const;
     int compare(const String& str) const;
-    int compare(size_type pos, size_type len, const String& str) const;
-    int compare(size_type pos, size_type len, const String& str, size_type subpos, size_type sublen) const;
+    int compare(std::size_t pos, std::size_t len, const String& str) const;
+    int compare(std::size_t pos, std::size_t len, const String& str, std::size_t subpos, std::size_t sublen) const;
     int compare(const char* s) const;
-    int compare(size_type pos, size_type len, const char* s) const;
-    int compare(size_type pos, size_type len, const char* s, size_type n) const;
+    int compare(std::size_t pos, std::size_t len, const char* s) const;
+    int compare(std::size_t pos, std::size_t len, const char* s, std::size_t n) const;
 
     // Member constants
-    static const size_type npos = static_cast<size_type>(-1);
+    static const std::size_t npos = static_cast<std::size_t>(-1);
 
 private:
     char* m_data = nullptr;
