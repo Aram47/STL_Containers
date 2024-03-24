@@ -25,18 +25,11 @@ public:
 
     std::size_t max_size() const noexcept;
 
-    template<typename U, typename... Args>
-    void construct(U*, Args&&...);
+    template<typename T>
+    void construct(T* p, const T& val);
 
     template<typename U>
     void destroy(U*);
-
-    template<typename U>
-    struct rebind 
-    {
-        typedef Allocator<U> other;
-    };
-
 };
 
 template<typename T, typename U>
