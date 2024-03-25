@@ -5,6 +5,7 @@
 #include <initializer_list>
 #include <stdexcept>
 #include <unistd.h>
+#include "./allocator.h"
 
 namespace DS
 {
@@ -13,8 +14,6 @@ class String {
 public:
     // Member types
     using traits_type       = std::char_traits<char>;
-    using allocator_type    = std::allocator<char>;
-    using difference_type   = std::ptrdiff_t;
 private:
     class Base_Iterator
     {
@@ -219,7 +218,7 @@ public:
     // String operations
     const char* c_str() const;
     const char* data() const;
-    allocator_type get_allocator() const;
+    DS::Allocator<char> get_allocator() const;
     std::size_t copy(char* s, std::size_t len, std::size_t pos = 0) const;
     std::size_t find(const String& str, std::size_t pos = 0) const;
     std::size_t find(const char* s, std::size_t pos = 0) const;
