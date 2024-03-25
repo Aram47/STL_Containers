@@ -46,7 +46,7 @@ std::size_t DS::Allocator<T>::max_size() const noexcept
 template <typename T>
 void DS::Allocator<T>::construct(T* p, const T& val)
 {
-    new (p) T(val);
+    new (p) T{val};
 }
 
 template <typename T>

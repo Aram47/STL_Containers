@@ -150,13 +150,14 @@ public:
 
     // Member functions
     String();
-    explicit String(const char* s);
-    explicit String(const String& other);
-    explicit String(String&& other);
+    explicit String(const char*);
+    explicit String(const String&);
+    explicit String(String&&);
+    String(std::initializer_list<char>);
     ~String();
 
-    String& operator=(const String& other);
-    String& operator=(String&& other);
+    String& operator=(const String&);
+    String& operator=(String&&);
     String& operator=(std::initializer_list<char>);
 
     // Iterators
@@ -256,7 +257,7 @@ public:
     static const std::size_t npos = static_cast<std::size_t>(-1);
 
 private:
-    char* m_data = nullptr;
+    char* m_data;
 };
 
 // Non-member function overloads

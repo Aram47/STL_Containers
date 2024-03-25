@@ -1,4 +1,8 @@
 #include <iostream>
+#include <initializer_list>
+#include <stdexcept>
+#include <unistd.h>
+#include "./allocator.h"
 #include "../header/string.h"
 
 DS::String::Base_Iterator::Base_Iterator(char* p)
@@ -511,4 +515,216 @@ typename DS::String::Reverse_Iterator& DS::String::Reverse_Iterator::operator-=(
 char& DS::String::Reverse_Iterator::operator[](std::size_t index)
 {
     return *(this -> ptr - index);
+}
+
+DS::String::String()
+        : m_data(nullptr)
+{
+
+}
+
+DS::String::String(const char* s)
+{
+    if (!(*s))
+        throw std::invalid_argument("");
+    
+        std::size_t sSize = 0;
+        // "Hello World!"
+        while (s[sSize++]); // 0 - 11 // 12
+    
+        DS::Allocator<char> alloc;
+
+        this -> m_data = alloc.allocate(sSize + 1);
+
+        for (std::size_t i = 0; i < sSize; ++i)
+            alloc.construct(&(this -> m_data[i]) , s[i]);
+
+        alloc.construct(&(this -> m_data[sSize]) , '\0');   
+}
+
+DS::String::String(const DS::String& other)
+{
+    DS::Allocator<char> alloc;
+    this -> m_data = alloc.allocate(other.size() + 1);
+
+    for (std::size_t i = 0; i < other.size(); ++i)
+        alloc.construct(&(this -> m_data[i]) ,other.m_data[i]);
+
+    alloc.construct(&(this -> m_data[other.size()]) , '\0');
+}
+
+DS::String::String(DS::String&& other)
+        : m_data(other.m_data)
+{
+    other.m_data = nullptr;
+}
+
+DS::String::String(std::initializer_list<char> list)
+{
+    DS::Allocator<char> alloc;
+
+    if (!(list.size()))
+    {
+        this -> m_data = alloc.allocate(sizeof(char));
+        alloc.construct(this -> m_data, '\0');
+    }
+    else
+    {
+        this -> m_data = alloc.allocate(list.size() + 1);
+        std::size_t i = 0;
+
+        for (auto it = list.begin() ; it < list.end(); ++it)
+            alloc.construct(&(this -> m_data[i++]), *it);
+
+        alloc.construct(&(this -> m_data[i]), '\0');
+    }
+}
+
+DS::String::~String()
+{
+    if (this -> m_data)
+    {
+        DS::Allocator<char> alloc;
+
+        for (std::size_t i = 0; i < this -> size(); ++i)
+            alloc.destroy(&(this -> m_data[i]));
+
+        alloc.deallocate(this -> m_data, this -> size());
+    }
+
+    this -> m_data = nullptr;
+}
+
+typename DS::String& DS::String::operator=(const DS::String& other)
+{
+    if (this == &other)
+        return *this;
+
+    DS::Allocator<char> alloc;
+
+    if (this -> m_data)
+    {
+        for (std::size_t i = 0; i < this -> size(); ++i)
+            alloc.destroy(this -> m_data + i);
+
+        alloc.deallocate(this -> m_data, this -> size());
+
+        this -> m_data = nullptr;    
+    }
+
+    this -> m_data = alloc.allocate(other.size() + 1);
+
+    for (std::size_t i = 0; i < other.size(); ++i)
+        alloc.construct(this -> m_data + i, other.m_data[i]);
+
+    alloc.construct(this -> m_data + other.size(), '\0');
+
+    return *this;   
+}
+
+typename DS::String& DS::String::operator=(DS::String&& other)
+{
+    if (this == &other)
+        return *this;
+
+    if (this -> m_data)
+    {
+        DS::Allocator<char> alloc;
+
+        for (std::size_t i = 0; i < this -> size(); ++i)
+            alloc.destroy(this -> m_data + i);
+
+        alloc.deallocate(this -> m_data, this -> size());
+
+        this -> m_data = nullptr;    
+    }
+
+    this -> m_data = other.m_data;
+    other.m_data = nullptr;
+
+    return *this;
+}
+
+typename DS::String& DS::String::operator=(std::initializer_list<char> list)
+{
+
+    DS::Allocator<char> alloc;
+
+    for (std::size_t i = 0; i < this -> size(); ++i)
+        alloc.destroy(this -> m_data + i);
+
+    alloc.deallocate(this -> m_data, this -> size());
+
+    this -> m_data = nullptr;
+
+    if (!list.size())
+    {
+        this -> m_data = alloc.allocate(sizeof(char));
+        alloc.construct(this -> m_data, '\0');
+    }
+    else
+    {
+        this -> m_data = alloc.allocate(list.size() + 1);
+
+        std::size_t i = 0;
+
+        for (auto it = list.begin(); it != list.end(); ++it)
+            alloc.construct(this -> m_data + (i++), *it);
+
+        alloc.construct(this -> m_data + list.size(), '\0');
+    }
+
+    return *this;
+}
+
+typename DS::String::Iterator DS::String::begin()
+{
+    return DS::String::Iterator(this -> m_data);
+}
+
+typename DS::String::Iterator DS::String::end()
+{
+    return DS::String::Iterator(this -> m_data + DS::String::size());
+}
+
+typename DS::String::Reverse_Iterator DS::String::rbegin()
+{
+    return DS::String::Reverse_Iterator(this -> m_data + DS::String::size() - 1);
+}
+
+typename DS::String::Reverse_Iterator DS::String::rend()
+{
+    return DS::String::Reverse_Iterator(this -> m_data - 1);
+}
+
+typename DS::String::Const_Iterator DS::String::cbegin() const
+{
+    return DS::String::Const_Iterator(this -> m_data);
+}
+
+typename DS::String::Const_Iterator DS::String::cend() const
+{
+    return DS::String::Const_Iterator(this -> m_data + DS::String::size());
+}
+
+typename DS::String::Const_Reverse_Iterator DS::String::crbegin() const
+{
+    return DS::String::Const_Reverse_Iterator(this -> m_data + DS::String::size() - 1);
+}
+
+typename DS::String::Const_Reverse_Iterator DS::String::crend() const
+{
+    return DS::String::Const_Reverse_Iterator(this -> m_data - 1);
+}
+
+std::size_t DS::String::size() const
+{
+    if (!(*(this -> m_data)))
+        return 0;
+
+    std::size_t strSize = 0;
+
+    while (this -> m_data[strSize++]);
+
+    return strSize - 1;
 }
