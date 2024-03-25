@@ -1,96 +1,56 @@
 #include <iostream>
+#include <stdexcept>
+#include <unistd.h>
 #include "../header/allocator.h"
 
 
 template <typename T>
-DS::Allocator<T>::Allocator() noexcept
-{
-
-}
-
-template <typename T>
-DS::Allocator<T>::Allocator(const DS::Allocator<T>& other) noexcept
-{
-
-}
-
-template <typename T>
-template<class U>
-DS::Allocator<T>::Allocator(const DS::Allocator<U>& other) noexcept
-{
-
-}
-
-template <typename T>
-DS::Allocator<T>::Allocator(DS::Allocator<T>&&)
-{
-
-}
-
-template <typename T>
-DS::Allocator<T>::~Allocator() noexcept
-{
-
-}
-
-template <typename T>
 T* DS::Allocator<T>::address(T& x) const noexcept
-{
-
+{   
+    return std::addressof(x);
 }
 
 template <typename T>
 const T* DS::Allocator<T>::address(const T& x) const noexcept
 {
-
+    return std::addressof(x);
 }
 
 template <typename T>
-T* DS::Allocator<T>::allocate(std::size_t n, const void* hint = 0)
+T* DS::Allocator<T>::allocate(std::size_t n)
 {
+    if (n >= DS::Allocator<T>::max_size())
+        throw std::bad_alloc();
 
-}
-
-template <typename T>
-T* DS::Allocator<T>::allocate(std::size_t n )
-{
-
+    return static_cast<T*>(::operator new(n * sizeof(T)));
 }
 
 template <typename T>
 void DS::Allocator<T>::deallocate(T* p, std::size_t n) noexcept
 {
-
+    ::operator delete(p);
 }
 
 template <typename T>
 std::size_t DS::Allocator<T>::max_size() const noexcept
 {
-    
+    std::size_t elem_size = sizeof(T);
+    std::size_t max_bytes, max_elements;
+
+    max_bytes = sysconf(_SC_PHYS_PAGES) * sysconf(_SC_PAGESIZE);
+    max_elements = max_bytes / elem_size;
+
+    return max_elements;
 }
 
 template <typename T>
-template<typename U, typename... Args>
-void DS::Allocator<T>::construct(U* p, Args&&... args)
+void DS::Allocator<T>::construct(T* p, const T& val)
 {
-
+    new (p) T(val);
 }
 
 template <typename T>
-template<typename U>
-void DS::Allocator<T>::destroy(U* p)
+void DS::Allocator<T>::destroy(T* p)
 {
-
-}
-
-template<typename T, typename U>
-inline bool DS::operator==(const DS::Allocator<T>&, const DS::Allocator<U>&) noexcept
-{
-    
-}
-
-template<typename T, typename U>
-inline bool DS::operator!=(const DS::Allocator<T>&, const DS::Allocator<U>&) noexcept
-{
-
+    p -> ~T();
 }
