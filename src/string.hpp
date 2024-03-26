@@ -719,7 +719,7 @@ typename DS::String::Const_Reverse_Iterator DS::String::crend() const
 
 std::size_t DS::String::size() const
 {
-    if (!(*(this -> m_data)))
+    if (!(this -> m_data) || !(*(this -> m_data)))
         return 0;
 
     std::size_t strSize = 0;
@@ -823,7 +823,7 @@ void DS::String::clear()
 
 bool DS::String::empty() const
 {
-    return !(this -> size());
+    return !(this -> m_data);
 }
 
 char& DS::String::operator[](std::size_t pos)
@@ -886,57 +886,181 @@ const char& DS::String::front() const
 
 typename DS::String& DS::String::operator+=(const DS::String& str)
 {
-    
+    if (str.empty())
+        return *this;
+
+    DS::Allocator<char> alloc;
+
+    char* temp = alloc.allocate(str.size() + this -> size() + 1);
+    alloc.construct(temp + str.size() + this -> size(), '\0');
+
+    for (std::size_t i = 0; i < this -> size(); ++i)
+        alloc.construct(temp + i, this -> m_data[i]);
+
+    std::size_t j = 0;
+
+    for (std::size_t i = this -> size(); i < str.size() + this -> size(); ++i)
+        alloc.construct(temp + i, str.m_data[j++]);
+
+    for (std::size_t i = 0; i < this -> size(); ++i)
+        alloc.destroy(this -> m_data + i);
+
+    alloc.deallocate(this -> m_data, this -> size());
+
+    this -> m_data = temp;
+
+    return *this;
 }
 
 typename DS::String& DS::String::operator+=(const char* s)
 {
+    if ((s == nullptr) || !(*s))
+        return *this;
 
+    DS::Allocator<char> alloc;
+    std::size_t sSize = 0;
+    while (s[sSize++]);
+
+    char* temp = alloc.allocate(this -> size() + sSize + 1);
+    alloc.construct(temp + this -> size() + sSize, '\0');
+
+    for (std::size_t i = 0; this -> m_data[i]; ++i)
+        alloc.construct(temp + i, this -> m_data[i]);
+
+    std::size_t j = 0;
+
+    for (std::size_t i = this -> size(); s[j]; ++i)
+        alloc.construct(temp + i, s[j++]);
+
+    for (std::size_t i = 0; i < this -> size(); ++i)
+        alloc.destroy(this -> m_data + i);
+
+    alloc.deallocate(this -> m_data, this -> size());
+
+    this -> m_data = temp;
+
+    return *this;
 }
 
 typename DS::String& DS::String::operator+=(char c)
 {
+    DS::Allocator<char> alloc;
 
+    char* temp = alloc.allocate(this -> size() + 2);
+    alloc.construct(temp + this -> size() + 1, '\0');
+    alloc.construct(temp + this -> size(), c);
+
+    if (this -> empty())
+    {
+        this -> m_data = temp;
+        return *this;
+    }
+
+    for (std::size_t i = 0; this -> m_data[i]; ++i)
+        alloc.construct(temp + i, this -> m_data[i]);
+
+    for (std::size_t i = 0; i < this -> size(); ++i)
+        alloc.destroy(this -> m_data + i);
+
+    alloc.deallocate(this -> m_data, this -> size());
+
+    this -> m_data = temp;
+
+    return *this;
 }
 
 typename DS::String& DS::String::append(const DS::String& str)
 {
+    if (str.empty())
+        throw std::invalid_argument("");
 
+    return *this += str; 
 }
 
 typename DS::String& DS::String::append(const char* s)
 {
+    if (!s || !(*s))
+        throw std::invalid_argument("");
 
+    return *this += s;
 }
 
 typename DS::String& DS::String::append(const char* s, std::size_t n)
 {
+    if (!s || !(*s))
+        throw std::invalid_argument("");
 
+    std::size_t i = 0;
+
+    while (s[i++]);
+
+    if (n >= i)
+        throw std::invalid_argument("");
+
+    if (!n)
+        return *this;
+
+    DS::Allocator<char> alloc;
+
+    char* temp = alloc.allocate(n + 1);
+    alloc.construct(temp + n, '\0');
+
+    return *this += temp;
 }
 
 typename DS::String& DS::String::append(std::size_t n, char c)
 {
+    if (!n)
+        return *this;
 
+    for (std::size_t i = 0; i < n; ++i)
+        *this += c;
+
+    return *this;
 }
 
 void DS::String::push_back(char c)
 {
-
+    *this += c;
 }
 
 typename DS::String& DS::String::assign(const DS::String& str)
-{
+{ 
+    *this = str;
 
+    return *this;
 }
 
 typename DS::String& DS::String::assign(const char* s)
 {
+    DS::String temp(s);
 
+    *this = temp;
+
+    return  *this;
 }
 
 typename DS::String& DS::String::assign(const char* s, std::size_t n)
 {
+    if (!s || !(*s))
+        throw std::invalid_argument("");
 
+    std::size_t i = 0;
+
+    while (s[i++]);
+
+    if (n >= i)
+        throw std::invalid_argument("");
+
+    if (!n)
+        return *this;
+
+    DS::Allocator<char> alloc;
+
+    char* temp = alloc.allocate(n + 1);
+    alloc.construct(temp + n, '\0');
+
+    return *this += temp;
 }
 
 typename DS::String& DS::String::assign(std::size_t n, char c)
