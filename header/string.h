@@ -174,18 +174,17 @@ public:
     std::size_t size() const;
     std::size_t length() const;
     std::size_t max_size() const;
-    void resize(std::size_t n);
+    void resize(std::size_t);
     std::size_t capacity() const;
-    void reserve(std::size_t n);
+    void reserve(std::size_t);
     void clear();
     bool empty() const;
-    void shrink_to_fit();
 
     // Element access
-    char& operator[](std::size_t pos);
-    const char& operator[](std::size_t pos) const;
-    char& at(std::size_t pos);
-    const char& at(std::size_t pos) const;
+    char& operator[](std::size_t);
+    const char& operator[](std::size_t) const;
+    char& at(std::size_t);
+    const char& at(std::size_t) const;
     char& back();
     const char& back() const;
     char& front();
