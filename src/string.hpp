@@ -2,7 +2,8 @@
 #include <initializer_list>
 #include <stdexcept>
 #include <unistd.h>
-#include "./allocator.h"
+#include <string.h>
+#include "../header/allocator.h"
 #include "../header/string.h"
 
 DS::String::Base_Iterator::Base_Iterator(char* p)
@@ -152,12 +153,12 @@ const typename DS::String::Const_Iterator& DS::String::Const_Iterator::operator-
     return temp;
 }
 
-const typename DS::String::Const_Iterator DS::String::Const_Iterator::operator+(long long int arg) const
+typename DS::String::Const_Iterator DS::String::Const_Iterator::operator+(long long int arg) const
 {
     return DS::String::Const_Iterator((this -> ptr) + arg);
 }
 
-const typename DS::String::Const_Iterator DS::String::Const_Iterator::operator-(long long int arg) const
+typename DS::String::Const_Iterator DS::String::Const_Iterator::operator-(long long int arg) const
 {
     return DS::String::Const_Iterator((this -> ptr) - arg);
 }
@@ -380,12 +381,12 @@ const typename DS::String::Const_Reverse_Iterator& DS::String::Const_Reverse_Ite
     return temp;
 }
 
-const typename DS::String::Const_Reverse_Iterator DS::String::Const_Reverse_Iterator::operator+(long long int arg) const
+typename DS::String::Const_Reverse_Iterator DS::String::Const_Reverse_Iterator::operator+(long long int arg) const
 {
     return DS::String::Const_Reverse_Iterator((this -> ptr) - arg);
 }
 
-const typename DS::String::Const_Reverse_Iterator DS::String::Const_Reverse_Iterator::operator-(long long int arg) const
+typename DS::String::Const_Reverse_Iterator DS::String::Const_Reverse_Iterator::operator-(long long int arg) const
 {
     return DS::String::Const_Reverse_Iterator((this -> ptr) + arg);
 }
@@ -525,7 +526,7 @@ DS::String::String()
 
 DS::String::String(const char* s)
 {
-    if (!(*s))
+    if (!s || !(*s))
         throw std::invalid_argument("");
     
         std::size_t sSize = 0;
@@ -589,10 +590,44 @@ DS::String::~String()
         for (std::size_t i = 0; i < this -> size(); ++i)
             alloc.destroy(&(this -> m_data[i]));
 
-        alloc.deallocate(this -> m_data, this -> size());
+        alloc.deallocate(this -> m_data, 0);
     }
 
     this -> m_data = nullptr;
+}
+
+typename DS::String& DS::String::operator=(const char* other)
+{
+    if (!other || !(*other))
+        throw std::invalid_argument("");
+
+    if (this -> m_data == other)
+        return *this;
+
+    std::size_t sSize = 0;
+    
+    while (other[sSize++]);
+    
+    DS::Allocator<char> alloc;
+
+    if (this -> m_data)
+    {
+        for (std::size_t i = 0; i < this -> size(); ++i)
+            alloc.destroy(this -> m_data + i);
+
+        alloc.deallocate(this -> m_data, 0);
+
+        this -> m_data = nullptr;
+    }
+
+    this -> m_data = alloc.allocate(sSize + 1);
+
+    for (std::size_t i = 0; i < sSize; ++i)
+        alloc.construct(&(this -> m_data[i]) , other[i]);
+
+    alloc.construct(&(this -> m_data[sSize]) , '\0');
+
+    return *this;
 }
 
 typename DS::String& DS::String::operator=(const DS::String& other)
@@ -607,7 +642,7 @@ typename DS::String& DS::String::operator=(const DS::String& other)
         for (std::size_t i = 0; i < this -> size(); ++i)
             alloc.destroy(this -> m_data + i);
 
-        alloc.deallocate(this -> m_data, this -> size());
+        alloc.deallocate(this -> m_data, 0);
 
         this -> m_data = nullptr;    
     }
@@ -634,7 +669,7 @@ typename DS::String& DS::String::operator=(DS::String&& other)
         for (std::size_t i = 0; i < this -> size(); ++i)
             alloc.destroy(this -> m_data + i);
 
-        alloc.deallocate(this -> m_data, this -> size());
+        alloc.deallocate(this -> m_data, 0);
 
         this -> m_data = nullptr;    
     }
@@ -653,7 +688,7 @@ typename DS::String& DS::String::operator=(std::initializer_list<char> list)
     for (std::size_t i = 0; i < this -> size(); ++i)
         alloc.destroy(this -> m_data + i);
 
-    alloc.deallocate(this -> m_data, this -> size());
+    alloc.deallocate(this -> m_data, 0);
 
     this -> m_data = nullptr;
 
@@ -765,7 +800,7 @@ void DS::String::resize(std::size_t n)
         for (std::size_t i = 0; i < this -> size(); ++i)
             alloc.destroy(this -> m_data + i);
 
-        alloc.deallocate(this -> m_data, this -> size());
+        alloc.deallocate(this -> m_data, 0);
 
         this -> m_data = temp;
     }
@@ -780,7 +815,7 @@ void DS::String::resize(std::size_t n)
         for (std::size_t i = 0; i < this -> size(); ++i)
             alloc.destroy(this -> m_data + i);
 
-        alloc.deallocate(this -> m_data, this -> size());
+        alloc.deallocate(this -> m_data, 0);
 
         this -> m_data = temp;
     }
@@ -803,7 +838,7 @@ void DS::String::reserve(std::size_t n)
     for (std::size_t i = 0; i < this -> size(); ++i)
         alloc.destroy(this -> m_data + i);
 
-    alloc.deallocate(this -> m_data, this -> size());
+    alloc.deallocate(this -> m_data, 0);
 
     this -> m_data = temp;
 }
@@ -905,7 +940,7 @@ typename DS::String& DS::String::operator+=(const DS::String& str)
     for (std::size_t i = 0; i < this -> size(); ++i)
         alloc.destroy(this -> m_data + i);
 
-    alloc.deallocate(this -> m_data, this -> size());
+    alloc.deallocate(this -> m_data, 0);
 
     this -> m_data = temp;
 
@@ -935,7 +970,7 @@ typename DS::String& DS::String::operator+=(const char* s)
     for (std::size_t i = 0; i < this -> size(); ++i)
         alloc.destroy(this -> m_data + i);
 
-    alloc.deallocate(this -> m_data, this -> size());
+    alloc.deallocate(this -> m_data, 0);
 
     this -> m_data = temp;
 
@@ -962,7 +997,7 @@ typename DS::String& DS::String::operator+=(char c)
     for (std::size_t i = 0; i < this -> size(); ++i)
         alloc.destroy(this -> m_data + i);
 
-    alloc.deallocate(this -> m_data, this -> size());
+    alloc.deallocate(this -> m_data, 0);
 
     this -> m_data = temp;
 
@@ -1065,287 +1100,748 @@ typename DS::String& DS::String::assign(const char* s, std::size_t n)
 
 typename DS::String& DS::String::assign(std::size_t n, char c)
 {
+    for (std::size_t i = 0; i < n; ++i)
+        *this += c;
 
+    return *this;
 }
 
 typename DS::String& DS::String::insert(std::size_t pos, const DS::String& str)
 {
+    if (pos >= this -> size())
+        throw std::out_of_range("");
 
+    if (str.empty() || !(str.size()))
+        return *this;
+
+    DS::Allocator<char> alloc;
+    char* temp = alloc.allocate(this -> size() + str.size() + 1);
+    alloc.construct(temp + this -> size() + str.size() , '\0');
+
+    std::size_t j = 0;
+
+    while (j < pos)
+        alloc.construct(temp + j, this -> m_data[j++]);
+
+    std::size_t k = j;
+
+    for (std::size_t i = 0; i < str.size(); ++i)
+        alloc.construct(temp + (k++), str.m_data[i]);
+    
+    while (j < this -> size())
+        alloc.construct(temp + (k++), this -> m_data[j++]);
+
+    for (std::size_t i = 0; i < this -> size(); ++i)
+        alloc.destroy(this -> m_data + i);
+
+    alloc.deallocate(this -> m_data, 0);
+
+    this -> m_data = temp;
+
+    return *this;
 }
 
 typename DS::String& DS::String::insert(std::size_t pos, const char* s)
 {
 
+    DS::String str = s;
+
+    this -> insert(pos, str);
+
+    return *this;
 }
 
 typename DS::String& DS::String::insert(std::size_t pos, const char* s, std::size_t n)
 {
+    std::size_t sSize = 0;
 
+    while (s[sSize++]);
+
+    if (n > sSize)
+        throw std::invalid_argument("");
+
+    DS::Allocator<char> alloc;
+
+    char* temp = alloc.allocate(sSize + 1);
+    alloc.construct(temp + sSize ,'\0');
+
+    for (std::size_t i = 0; i < sSize; ++i)
+        alloc.construct(temp + i, s[i]);
+
+    this -> insert(pos, temp);
+
+    return *this;
 }
 
 typename DS::String& DS::String::insert(std::size_t pos, std::size_t n, char c)
 {
+    DS::Allocator<char> alloc;
 
+    char* temp = alloc.allocate(n + 1);
+    alloc.construct(temp + n ,'\0');
+
+    for (std::size_t i = 0; i < n; ++i)
+        alloc.construct(temp + i ,c);
+
+    this -> insert(pos, temp);
+
+    return *this;
 }
 
 typename DS::String& DS::String::erase(std::size_t pos = 0, std::size_t len = npos)
 {
+    if (pos >= this -> size())
+        throw std::out_of_range("");
 
+    DS::Allocator<char> alloc;
+
+    if ((len - pos) == this -> size() - 1)
+    {
+        for (std::size_t i = 1; i < this -> size(); ++i)
+            alloc.destroy(this -> m_data + i);
+
+        alloc.construct(this -> m_data, '\0');
+
+        return *this;
+    }
+
+    char *temp = alloc.allocate(this -> size() - len - pos + 1);
+    alloc.construct(temp + (this -> size() - len - pos) ,'\0');
+
+    std::size_t j = 0;
+
+    while (j < pos)
+    {
+        alloc.construct(temp + j, this -> m_data[j]);
+        ++j;
+    }
+
+    for (std::size_t i = len; j < this -> size(); ++i)
+    {
+        alloc.construct(temp + j, this -> m_data[i]);
+        ++j;
+    }
+
+    *this = temp;
+
+    return *this;
 }
 
 typename DS::String& DS::String::replace(std::size_t pos, std::size_t len, const DS::String& str)
 {
+    this -> erase(pos, len);
+    this -> insert(pos, str);
 
+    return *this;
 }
 
 typename DS::String& DS::String::replace(std::size_t pos, std::size_t len, const char* s)
 {
+    this -> erase(pos, len);
+    this -> insert(pos, s);
 
+    return *this;
 }
 
 typename DS::String& DS::String::replace(std::size_t pos, std::size_t len, const char* s, std::size_t n)
 {
+    this -> erase(pos, len);
+    this -> insert(pos, s, n);
 
+    return *this;
 }
 
 typename DS::String& DS::String::replace(std::size_t pos, std::size_t len, std::size_t n, char c)
 {
+    this -> erase(pos, len);
+    this -> insert(pos, n, c);
 
+    return *this;
 }
 
 void DS::String::swap(DS::String& other)
 {
-
+    char* ptr = other.m_data;
+    other.m_data = this -> m_data;
+    this -> m_data = ptr;
 }
 
 void DS::String::pop_back()
 {
+    DS::Allocator<char> alloc;
 
+    char* temp = alloc.allocate(this -> size());
+    alloc.construct(temp + (this -> size() - 1), '\0');
+
+    for (std::size_t i = 0; i < this -> size() - 1; ++i)
+        alloc.construct(temp + i, this -> m_data[i]);
+
+    *this = temp;
 }
 
 const char* DS::String::c_str() const
 {
-
+    return this -> m_data;
 }
 
 const char* DS::String::data() const
 {
-
+    return this -> m_data;
 }
 
 typename DS::Allocator<char> DS::String::get_allocator() const
 {
-
+    return DS::Allocator<char>();
 }
 
 std::size_t DS::String::copy(char* s, std::size_t len, std::size_t pos = 0) const
 {
+    if (pos > this -> size())
+        throw std::out_of_range("");
 
+    if (len >= this -> size())
+        len = this -> size();
+
+    DS::Allocator<char> alloc;
+
+    s = alloc.allocate(len - pos + 1);
+    alloc.construct(s + (len - pos), '\0');
+
+    std::size_t j = 0;
+    for (std::size_t i = pos; i < len; ++i)
+        alloc.construct(s + (j++), this -> m_data[i]);
+
+    return len - pos;
 }
 
 std::size_t DS::String::find(const DS::String& str, std::size_t pos = 0) const
 {
+    std::size_t len = this -> size();
+    std::size_t strLen = str.size();
 
+    if (pos >= len || strLen == 0)
+        return npos;
+
+    std::size_t maxOffset = len - strLen;
+
+    for (std::size_t i = pos; i <= maxOffset; ++i)
+    {
+        if (this -> m_data[i] == str.m_data[0])
+        {
+            std::size_t j = 1;
+
+            while (j < strLen && this -> m_data[i + j] == str.m_data[j])
+                ++j;
+            
+            if (j == strLen)
+                return i;
+        }
+    }
+
+    return npos;
 }
 
 std::size_t DS::String::find(const char* s, std::size_t pos = 0) const
 {
 
+    std::size_t len = 0;
+
+    while (s[len++]);
+
+    return find(s, pos, len);
 }
 
 std::size_t DS::String::find(const char* s, std::size_t pos, std::size_t n) const
 {
+    std::size_t len = this -> size();
 
+    if (n > len)
+        return npos;
+
+    std::size_t maxOffset = len - n;
+
+    for (std::size_t i = pos; i <= maxOffset; ++i)
+        if (strncmp(this -> m_data + i, s, n) == 0)
+            return i;
+
+    return npos;
 }
 
 std::size_t DS::String::find(char c, std::size_t pos = 0) const
 {
+    std::size_t len = this -> size();
 
+    for (std::size_t i = pos; i < len; ++i)
+        if (this -> m_data[i] == c)
+            return i;
+
+    return npos;
 }
 
 std::size_t DS::String::rfind(const DS::String& str, std::size_t pos = npos) const
 {
+    std::size_t len = this -> size();
+    std::size_t strLen = str.size();
 
+    if (strLen == 0)
+        return (pos < len) ? pos : len;
+
+    pos = std::min(pos, len - strLen);
+
+    for (std::size_t i = pos; i != npos; --i)
+    {
+        if (this -> m_data[i] == str.m_data[0])
+        {
+            std::size_t j = 1;
+
+            while (j < strLen && this -> m_data[i + j] == str.m_data[j])
+                ++j;
+
+            if (j == strLen)
+                return i;
+        }
+    }
+
+    return npos;
 }
 
 std::size_t DS::String::rfind(const char* s, std::size_t pos = npos) const
 {
+    std::size_t len = 0;
 
+    while (s[len++]);
+
+    return rfind(s, pos, len);
 }
 
 std::size_t DS::String::rfind(const char* s, std::size_t pos, std::size_t n) const
 {
+    std::size_t len = this -> size();
 
+    if (n > len)
+        return npos;
+
+    pos = std::min(pos, len - n);
+
+    for (std::size_t i = pos; i != npos; --i)
+        if (strncmp(this -> m_data + i, s, n) == 0)
+            return i;
+
+    return npos;
 }
 
 std::size_t DS::String::rfind(char c, std::size_t pos = npos) const
 {
+    std::size_t len = this -> size();
 
+    pos = std::min(pos, len - 1);
+
+    for (std::size_t i = pos; i != npos; --i)
+        if (this -> m_data[i] == c)
+            return i;
+
+    return npos;
 }
 
 std::size_t DS::String::find_first_of(const DS::String& str, std::size_t pos = 0) const
 {
+    std::size_t len = this -> size();
+    std::size_t strLen = str.size();
 
+    if (strLen == 0)
+        return npos;
+
+    std::size_t maxOffset = len - 1;
+
+    for (std::size_t i = pos; i < len; ++i)
+        if (str.find(this -> m_data[i]) != npos)
+            return i;
+
+    return npos;
 }
 
 std::size_t DS::String::find_first_of(const char* s, std::size_t pos = 0) const
 {
+    std::size_t len = this -> size();
 
+    if (!s || *s == '\0')
+        return npos;
+
+    pos = std::min(pos, len - 1);
+
+    for (std::size_t i = pos; i < len; ++i)
+        if (strchr(s, this -> m_data[i]) != nullptr)
+            return i;
+
+    return npos;
 }
 
 std::size_t DS::String::find_first_of(const char* s, std::size_t pos, std::size_t n) const
 {
+    std::size_t len = this -> size();
 
+    if (!s || *s == '\0')
+        return npos;
+
+    pos = std::min(pos, len - 1);
+
+    for (std::size_t i = pos; i < len; ++i)
+        if (strchr(s, this -> m_data[i]) != nullptr)
+            return i;
+
+    return npos;
 }
 
 std::size_t DS::String::find_first_of(char c, std::size_t pos = 0) const
 {
+    std::size_t len = this -> size();
 
+    pos = std::min(pos, len - 1);
+
+    for (std::size_t i = pos; i < len; ++i)
+        if (this -> m_data[i] == c)
+            return i;
+
+    return npos;
 }
 
 std::size_t DS::String::find_last_of(const DS::String& str, std::size_t pos = npos) const
 {
+    std::size_t len = this -> size();
+    std::size_t strLen = str.size();
 
+    if (strLen == 0)
+        return npos;
+
+    pos = std::min(pos, len - 1);
+
+    for (std::size_t i = pos; i != npos; --i)
+        if (str.find(this -> m_data[i]) != npos)
+            return i;
+
+    return npos;
 }
 
 std::size_t DS::String::find_last_of(const char* s, std::size_t pos = npos) const
 {
+    std::size_t len = this -> size();
 
+    if (!s || *s == '\0')
+        return npos;
+
+    pos = std::min(pos, len - 1);
+
+    for (std::size_t i = pos; i != npos; --i)
+        if (strchr(s, this -> m_data[i]) != nullptr)
+            return i;
+
+    return npos;
 }
 
 std::size_t DS::String::find_last_of(const char* s, std::size_t pos, std::size_t n) const
 {
+    std::size_t len = this -> size();
 
+    if (!s || *s == '\0')
+        return npos;
+
+    pos = std::min(pos, len - 1);
+
+    for (std::size_t i = pos; i != npos; --i)
+        if (strchr(s, this -> m_data[i]) != nullptr)
+            return i;
+
+    return npos;
 }
 
 std::size_t DS::String::find_last_of(char c, std::size_t pos = npos) const
 {
+    std::size_t len = this -> size();
 
+    pos = std::min(pos, len - 1);
+
+    for (std::size_t i = pos; i != npos; --i)
+        if (this -> m_data[i] == c)
+            return i;
+
+    return npos;
 }
 
 std::size_t DS::String::find_first_not_of(const DS::String& str, std::size_t pos = 0) const
 {
+    std::size_t len = this -> size();
+    std::size_t strLen = str.size();
 
+    if (strLen == 0)
+        return pos;
+
+    pos = std::min(pos, len - 1);
+
+    for (std::size_t i = pos; i < len; ++i)
+        if (str.find(this -> m_data[i]) == npos)
+            return i;
+
+    return npos;
 }
 
 std::size_t DS::String::find_first_not_of(const char* s, std::size_t pos = 0) const
 {
+    std::size_t len = this -> size();
 
+    if (!s || *s == '\0')
+        return pos;
+
+    pos = std::min(pos, len - 1);
+
+    for (std::size_t i = pos; i < len; ++i)
+        if (strchr(s, this -> m_data[i]) == nullptr)
+            return i;
+
+    return npos;
 }
 
 std::size_t DS::String::find_first_not_of(const char* s, std::size_t pos, std::size_t n) const
 {
+    std::size_t len = this -> size();
 
+    if (!s || *s == '\0')
+        return pos;
+
+    pos = std::min(pos, len - 1);
+
+    for (std::size_t i = pos; i < len; ++i)
+        if (strncmp(s, &(this -> m_data[i]), n) != 0)
+            return i;
+
+    return npos;
 }
 
 std::size_t DS::String::find_first_not_of(char c, std::size_t pos = 0) const
 {
+    std::size_t len = this -> size();
 
+    pos = std::min(pos, len - 1);
+
+    for (std::size_t i = pos; i < len; ++i)
+        if (this -> m_data[i] != c)
+            return i;
+
+    return npos;
 }
 
 std::size_t DS::String::find_last_not_of(const DS::String& str, std::size_t pos = npos) const
 {
+    std::size_t len = this -> size();
 
+    if (len == 0)
+        return npos;
+
+    if (pos == npos)
+        pos = len - 1;
+    else
+        pos = std::min(pos, len - 1);
+
+    for (std::size_t i = pos; i != npos; --i)
+        if (str.find(this -> m_data[i]) == npos)
+            return i;
+
+    return npos;
 }
 
 std::size_t DS::String::find_last_not_of(const char* s, std::size_t pos = npos) const
 {
+    std::size_t len = this -> size();
 
+    if (len == 0)
+        return npos;
+
+    if (!s || *s == '\0')
+        return pos;
+
+    if (pos == npos)
+        pos = len - 1;
+    else
+        pos = std::min(pos, len - 1);
+
+    for (std::size_t i = pos; i != npos; --i)
+        if (strchr(s, this -> m_data[i]) == nullptr)
+            return i;
+
+    return npos;
 }
 
 std::size_t DS::String::find_last_not_of(const char* s, std::size_t pos, std::size_t n) const
 {
+    std::size_t len = this -> size();
 
+    if (len == 0)
+        return npos;
+
+    if (!s || *s == '\0')
+        return pos;
+
+    if (pos == npos)
+        pos = len - 1;
+    else
+        pos = std::min(pos, len - 1);
+
+    for (std::size_t i = pos; i != npos; --i)
+        if (strncmp(s, &(this -> m_data[i]), n) != 0)
+            return i;
+
+    return npos;
 }
 
 std::size_t DS::String::find_last_not_of(char c, std::size_t pos = npos) const
 {
+    std::size_t len = this -> size();
 
+    if (len == 0)
+        return npos;
+
+    if (pos == npos)
+        pos = len - 1;
+    else
+        pos = std::min(pos, len - 1);
+
+    for (std::size_t i = pos; i != npos; --i)
+        if (this -> m_data[i] != c)
+            return i;
+
+    return npos;
 }
 
 typename DS::String DS::String::substr(std::size_t pos = 0, std::size_t len = npos) const
 {
+    std::size_t subLength = (len == npos) ? (this -> size() - pos) : std::min(len, this -> size() - pos);
 
+    DS::Allocator<char> alloc;
+    DS::String subString;
+    subString.m_data = alloc.allocate(subLength + 1);
+
+    memcpy(subString.m_data, this -> m_data + pos, subLength);
+    alloc.construct(subString.m_data + subLength, '\0');
+
+    return subString;
 }
 
 int DS::String::compare(const DS::String& str) const
 {
-
+    return DS::String::compare(0, this -> size(), str);
 }
 
 int DS::String::compare(std::size_t pos, std::size_t len, const DS::String& str) const
 {
-
+    return DS::String::compare(pos, len, str.m_data);
 }
 
 int DS::String::compare(std::size_t pos, std::size_t len, const DS::String& str, std::size_t subpos, std::size_t sublen) const
 {
+    std::size_t subStrLen = str.size();
 
+    if (subpos >= subStrLen)
+        return 1;
+
+    sublen = std::min(sublen, subStrLen - subpos);
+    return DS::String::compare(pos, len, str.m_data + subpos, sublen);
 }
 
 int DS::String::compare(const char* s) const
 {
-
+     return DS::String::compare(0, this -> size(), s);
 }
 
 int DS::String::compare(std::size_t pos, std::size_t len, const char* s) const
 {
+    std::size_t sLen = strlen(s);
 
+    return DS::String::compare(pos, len, s, sLen);
 }
 
 int DS::String::compare(std::size_t pos, std::size_t len, const char* s, std::size_t n) const
 {
+    std::size_t sLen = strlen(s);
 
+    std::size_t subLen = std::min(len, this -> size() - pos);
+
+    int result = strncmp(this -> m_data + pos, s, std::min(subLen, n));
+
+    if (result != 0)
+        return result;
+
+    if (subLen < n)
+        return -1;
+
+    return (subLen == n) ? 0 : 1;
 }
 
 // ---------- global ---------
 
-typename DS::String operator+(const DS::String& lhs, const DS::String& rhs)
+typename DS::String DS::operator+(const DS::String& lhs, const DS::String& rhs)
 {
+    DS::String temp = lhs;
 
+    temp += rhs;
+
+    return temp;
 }
 
-typename DS::String operator+(const DS::String& lhs, const char* rhs)
+typename DS::String DS::operator+(const DS::String& lhs, const char* rhs)
 {
+    DS::String temp = lhs;
 
+    temp += rhs;
+
+    return temp;
 }
 
-typename DS::String operator+(const char* lhs, const DS::String& rhs)
+typename DS::String DS::operator+(const char* lhs, const DS::String& rhs)
 {
+    DS::String temp = lhs;
 
+    temp += rhs;
+
+    return temp;
 }
 
 bool DS::operator==(const DS::String& lhs, const DS::String& rhs)
 {
-
+    return lhs == rhs;
 }
 
 bool DS::operator!=(const DS::String& lhs, const DS::String& rhs)
 {
-
+    return lhs != rhs;
 }
 
 bool DS::operator<(const DS::String& lhs, const DS::String& rhs)
 {
-
+    return lhs < rhs;
 }
 
 bool DS::operator<=(const DS::String& lhs, const DS::String& rhs)
 {
-
+    return lhs <= rhs;
 }
 
 bool DS::operator>(const DS::String& lhs, const DS::String& rhs)
 {
-
+    return lhs > rhs;
 }
 
 bool DS::operator>=(const DS::String& lhs, const DS::String& rhs)
 {
-
+    return lhs >= rhs;
 }
 
 void DS::swap(DS::String& lhs, DS::String& rhs)
 {
+    DS::String temp = lhs;
+    lhs = rhs;
+    rhs = temp;
+}
 
+std::ostream& DS::operator<<(std::ostream& os, const typename DS::String& str) 
+{
+    return os << str.c_str();
 }

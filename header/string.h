@@ -57,8 +57,8 @@ public:
         const Const_Iterator& operator++(int);
         const Const_Iterator& operator--();
         const Const_Iterator& operator--(int);
-        const Const_Iterator operator+(long long int) const;
-        const Const_Iterator operator-(long long int) const;
+        Const_Iterator operator+(long long int) const;
+        Const_Iterator operator-(long long int) const;
         const Const_Iterator& operator+=(long long int);
         const Const_Iterator& operator-=(long long int);
         const char& operator[](std::size_t) const;
@@ -113,8 +113,8 @@ public:
         const Const_Reverse_Iterator& operator++(int);
         const Const_Reverse_Iterator& operator--();
         const Const_Reverse_Iterator& operator--(int);
-        const Const_Reverse_Iterator operator+(long long int) const;
-        const Const_Reverse_Iterator operator-(long long int) const;
+        Const_Reverse_Iterator operator+(long long int) const;
+        Const_Reverse_Iterator operator-(long long int) const;
         const Const_Reverse_Iterator& operator+=(long long int);
         const Const_Reverse_Iterator& operator-=(long long int);
         const char& operator[](std::size_t) const;
@@ -150,12 +150,13 @@ public:
 
     // Member functions
     String();
-    explicit String(const char*);
-    explicit String(const String&);
-    explicit String(String&&);
+    String(const char*);
+    String(const String&);
+    String(String&&);
     String(std::initializer_list<char>);
     ~String();
 
+    String& operator=(const char *);
     String& operator=(const String&);
     String& operator=(String&&);
     String& operator=(std::initializer_list<char>);
@@ -207,7 +208,7 @@ public:
     String& insert(std::size_t, const char*);
     String& insert(std::size_t, const char*, std::size_t);
     String& insert(std::size_t, std::size_t, char);
-    String& erase(std::size_t = 0, std::size_t = npos);
+    String& erase(std::size_t, std::size_t);
     String& replace(std::size_t, std::size_t, const String&);
     String& replace(std::size_t, std::size_t, const char*);
     String& replace(std::size_t, std::size_t, const char*, std::size_t);
@@ -219,32 +220,32 @@ public:
     const char* c_str() const;
     const char* data() const;
     DS::Allocator<char> get_allocator() const;
-    std::size_t copy(char*, std::size_t, std::size_t = 0) const;
-    std::size_t find(const String&, std::size_t = 0) const;
-    std::size_t find(const char*, std::size_t = 0) const;
+    std::size_t copy(char*, std::size_t, std::size_t) const;
+    std::size_t find(const String&, std::size_t) const;
+    std::size_t find(const char*, std::size_t) const;
     std::size_t find(const char*, std::size_t, std::size_t) const;
-    std::size_t find(char, std::size_t = 0) const;
-    std::size_t rfind(const String&, std::size_t = npos) const;
-    std::size_t rfind(const char*, std::size_t = npos) const;
+    std::size_t find(char, std::size_t) const;
+    std::size_t rfind(const String&, std::size_t) const;
+    std::size_t rfind(const char*, std::size_t) const;
     std::size_t rfind(const char*, std::size_t, std::size_t) const;
-    std::size_t rfind(char, std::size_t = npos) const;
-    std::size_t find_first_of(const String&, std::size_t = 0) const;
-    std::size_t find_first_of(const char*, std::size_t = 0) const;
+    std::size_t rfind(char, std::size_t) const;
+    std::size_t find_first_of(const String&, std::size_t) const;
+    std::size_t find_first_of(const char*, std::size_t) const;
     std::size_t find_first_of(const char*, std::size_t, std::size_t) const;
-    std::size_t find_first_of(char, std::size_t = 0) const;
-    std::size_t find_last_of(const String&, std::size_t = npos) const;
-    std::size_t find_last_of(const char*, std::size_t = npos) const;
+    std::size_t find_first_of(char, std::size_t) const;
+    std::size_t find_last_of(const String&, std::size_t) const;
+    std::size_t find_last_of(const char*, std::size_t) const;
     std::size_t find_last_of(const char*, std::size_t, std::size_t) const;
-    std::size_t find_last_of(char, std::size_t = npos) const;
-    std::size_t find_first_not_of(const String&, std::size_t = 0) const;
-    std::size_t find_first_not_of(const char*, std::size_t = 0) const;
+    std::size_t find_last_of(char, std::size_t) const;
+    std::size_t find_first_not_of(const String&, std::size_t) const;
+    std::size_t find_first_not_of(const char*, std::size_t) const;
     std::size_t find_first_not_of(const char*, std::size_t, std::size_t) const;
-    std::size_t find_first_not_of(char, std::size_t = 0) const;
-    std::size_t find_last_not_of(const String&, std::size_t = npos) const;
-    std::size_t find_last_not_of(const char*, std::size_t = npos) const;
+    std::size_t find_first_not_of(char, std::size_t) const;
+    std::size_t find_last_not_of(const String&, std::size_t) const;
+    std::size_t find_last_not_of(const char*, std::size_t) const;
     std::size_t find_last_not_of(const char*, std::size_t, std::size_t) const;
-    std::size_t find_last_not_of(char, std::size_t = npos) const;
-    String substr(std::size_t = 0, std::size_t = npos) const;
+    std::size_t find_last_not_of(char, std::size_t) const;
+    String substr(std::size_t, std::size_t) const;
     int compare(const String&) const;
     int compare(std::size_t, std::size_t, const String&) const;
     int compare(std::size_t, std::size_t, const String&, std::size_t, std::size_t) const;
@@ -260,16 +261,17 @@ private:
 };
 
 // Non-member function overloads
-String operator+(const String& lhs, const String& rhs);
-String operator+(const String& lhs, const char* rhs);
-String operator+(const char* lhs, const String& rhs);
-bool operator==(const String& lhs, const String& rhs);
-bool operator!=(const String& lhs, const String& rhs);
-bool operator<(const String& lhs, const String& rhs);
-bool operator<=(const String& lhs, const String& rhs);
-bool operator>(const String& lhs, const String& rhs);
-bool operator>=(const String& lhs, const String& rhs);
-void swap(String& lhs, String& rhs);
+std::ostream& operator<<(std::ostream& os, const DS::String& str);
+String operator+(const String&, const String&);
+String operator+(const String&, const char*);
+String operator+(const char*, const String&);
+bool operator==(const String&, const String&);
+bool operator!=(const String&, const String&);
+bool operator<(const String&, const String&);
+bool operator<=(const String&, const String&);
+bool operator>(const String&, const String&);
+bool operator>=(const String&, const String&);
+void swap(String&, String&);
 
 
 }

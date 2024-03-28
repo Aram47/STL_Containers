@@ -175,13 +175,13 @@ const typename DS::Vector<T>::Const_Iterator& DS::Vector<T>::Const_Iterator::ope
 }
 
 template <typename T>
-const typename DS::Vector<T>::Const_Iterator DS::Vector<T>::Const_Iterator::operator+(long long int arg) const
+typename DS::Vector<T>::Const_Iterator DS::Vector<T>::Const_Iterator::operator+(long long int arg) const
 {
     return DS::Vector<T>::Const_Iterator((this -> ptr) + arg);
 }
 
 template <typename T>
-const typename DS::Vector<T>::Const_Iterator DS::Vector<T>::Const_Iterator::operator-(long long int arg) const
+typename DS::Vector<T>::Const_Iterator DS::Vector<T>::Const_Iterator::operator-(long long int arg) const
 {
     return DS::Vector<T>::Const_Iterator((this -> ptr) - arg);
 }
@@ -437,13 +437,13 @@ const typename DS::Vector<T>::Const_Reverse_Iterator& DS::Vector<T>::Const_Rever
 }
 
 template <typename T>
-const typename DS::Vector<T>::Const_Reverse_Iterator DS::Vector<T>::Const_Reverse_Iterator::operator+(long long int arg) const
+typename DS::Vector<T>::Const_Reverse_Iterator DS::Vector<T>::Const_Reverse_Iterator::operator+(long long int arg) const
 {
     return DS::Vector<T>::Const_Reverse_Iterator((this -> ptr) - arg);
 }
 
 template <typename T>
-const typename DS::Vector<T>::Const_Reverse_Iterator DS::Vector<T>::Const_Reverse_Iterator::operator-(long long int arg) const
+typename DS::Vector<T>::Const_Reverse_Iterator DS::Vector<T>::Const_Reverse_Iterator::operator-(long long int arg) const
 {
     return DS::Vector<T>::Const_Reverse_Iterator((this -> ptr) + arg);
 }

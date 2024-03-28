@@ -60,8 +60,8 @@ public:
     const Const_Iterator& operator++(int);
     const Const_Iterator& operator--();
     const Const_Iterator& operator--(int);
-    const Const_Iterator operator+(long long int) const;
-    const Const_Iterator operator-(long long int) const;
+    Const_Iterator operator+(long long int) const;
+    Const_Iterator operator-(long long int) const;
     const Const_Iterator& operator+=(long long int);
     const Const_Iterator& operator-=(long long int);
     const T& operator[](std::size_t) const;
@@ -116,8 +116,8 @@ public:
     const Const_Reverse_Iterator& operator++(int);
     const Const_Reverse_Iterator& operator--();
     const Const_Reverse_Iterator& operator--(int);
-    const Const_Reverse_Iterator operator+(long long int) const;
-    const Const_Reverse_Iterator operator-(long long int) const;
+    Const_Reverse_Iterator operator+(long long int) const;
+    Const_Reverse_Iterator operator-(long long int) const;
     const Const_Reverse_Iterator& operator+=(long long int);
     const Const_Reverse_Iterator& operator-=(long long int);
     const T& operator[](std::size_t) const;
