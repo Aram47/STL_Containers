@@ -51,7 +51,7 @@ const typename DS::String::Base_Iterator& DS::String::Base_Iterator::operator=(c
 {
     if (this == &rhv)
         return *this;
-
+    
     this -> ptr = rhv.ptr;
     
     return *this;
@@ -629,7 +629,7 @@ typename DS::String& DS::String::operator=(const char* other)
 
     return *this;
 }
-
+// ----------------
 typename DS::String& DS::String::operator=(const DS::String& other)
 {
     if (this == &other)
@@ -1190,23 +1190,13 @@ typename DS::String& DS::String::insert(std::size_t pos, std::size_t n, char c)
 
 typename DS::String& DS::String::erase(std::size_t pos = 0, std::size_t len = npos)
 {
-    if (pos >= this -> size())
+    if (pos > this -> size())
         throw std::out_of_range("");
 
     DS::Allocator<char> alloc;
 
-    if ((len - pos) == this -> size() - 1)
-    {
-        for (std::size_t i = 1; i < this -> size(); ++i)
-            alloc.destroy(this -> m_data + i);
-
-        alloc.construct(this -> m_data, '\0');
-
-        return *this;
-    }
-
-    char *temp = alloc.allocate(this -> size() - len - pos + 1);
-    alloc.construct(temp + (this -> size() - len - pos) ,'\0');
+    char* temp = alloc.allocate(this -> size() - len  + 1);
+    alloc.construct(temp + this -> size() - len, '\0');
 
     std::size_t j = 0;
 
@@ -1216,7 +1206,7 @@ typename DS::String& DS::String::erase(std::size_t pos = 0, std::size_t len = np
         ++j;
     }
 
-    for (std::size_t i = len; j < this -> size(); ++i)
+    for (std::size_t i = pos + len; i < this -> size(); ++i)
     {
         alloc.construct(temp + j, this -> m_data[i]);
         ++j;
@@ -1229,32 +1219,37 @@ typename DS::String& DS::String::erase(std::size_t pos = 0, std::size_t len = np
 
 typename DS::String& DS::String::replace(std::size_t pos, std::size_t len, const DS::String& str)
 {
-    this -> erase(pos, len);
     this -> insert(pos, str);
+
+    this -> erase(pos + str.size() - 1, len);
 
     return *this;
 }
 
 typename DS::String& DS::String::replace(std::size_t pos, std::size_t len, const char* s)
 {
-    this -> erase(pos, len);
     this -> insert(pos, s);
+
+    std::size_t i = 0;
+    while (s[i++]);
+
+    this -> erase(pos + i - 1, len);
 
     return *this;
 }
 
 typename DS::String& DS::String::replace(std::size_t pos, std::size_t len, const char* s, std::size_t n)
 {
-    this -> erase(pos, len);
     this -> insert(pos, s, n);
+    this -> erase(pos + n - 1, len);
 
     return *this;
 }
 
 typename DS::String& DS::String::replace(std::size_t pos, std::size_t len, std::size_t n, char c)
 {
-    this -> erase(pos, len);
     this -> insert(pos, n, c);
+    this -> erase(pos + n - 1, len);
 
     return *this;
 }
@@ -1775,7 +1770,10 @@ int DS::String::compare(std::size_t pos, std::size_t len, const char* s, std::si
     return (subLen == n) ? 0 : 1;
 }
 
-// ---------- global ---------
+std::ostream& DS::operator<<(std::ostream& os, const typename DS::String& str) 
+{
+    return os << str.c_str();
+}
 
 typename DS::String DS::operator+(const DS::String& lhs, const DS::String& rhs)
 {
@@ -1806,32 +1804,75 @@ typename DS::String DS::operator+(const char* lhs, const DS::String& rhs)
 
 bool DS::operator==(const DS::String& lhs, const DS::String& rhs)
 {
-    return lhs == rhs;
+    if (lhs.size() != rhs.size())
+        return false;
+
+
+    for (auto it = lhs.cbegin(), jt = rhs.cbegin(); it != lhs.cend(); ++it, ++jt)
+        if (*it != *jt)
+            return false;
+
+    return true;
 }
 
 bool DS::operator!=(const DS::String& lhs, const DS::String& rhs)
 {
-    return lhs != rhs;
+    if (lhs.size() != rhs.size())
+        return true;
+
+    for (auto it = lhs.cbegin(), jt = rhs.cbegin(); it != lhs.cend(); ++it, ++jt)
+        if (*it != *jt)
+            return true;
+
+    return false;
 }
 
 bool DS::operator<(const DS::String& lhs, const DS::String& rhs)
 {
-    return lhs < rhs;
+    if (lhs.size() > rhs.size())
+        return false;
+
+    for (auto it = lhs.cbegin(), jt = rhs.cbegin(); it != lhs.cend() ;++it, ++jt)
+        if (*it >= *jt)
+            return false;
+
+    return true;
 }
 
 bool DS::operator<=(const DS::String& lhs, const DS::String& rhs)
 {
-    return lhs <= rhs;
+    if (lhs.size() > rhs.size())
+        return false;
+
+    for (auto it = lhs.cbegin(), jt = rhs.cbegin(); it != lhs.cend(); ++it, ++jt)
+        if (*it > *jt)
+            return false;
+
+    return true;
 }
 
 bool DS::operator>(const DS::String& lhs, const DS::String& rhs)
 {
-    return lhs > rhs;
+    if (lhs.size() <= rhs.size())
+        return false;
+
+    for (auto it = rhs.cbegin(), jt = lhs.cbegin(); it != rhs.cend(); ++it, ++jt)
+        if (*it <= *jt)
+            return false;
+
+    return true;
 }
 
 bool DS::operator>=(const DS::String& lhs, const DS::String& rhs)
 {
-    return lhs >= rhs;
+    if (lhs.size() < rhs.size())
+        return false;
+
+    for (auto it = rhs.cbegin(), jt = lhs.cbegin(); it != rhs.cend(); ++it, ++jt)
+        if (*it > *jt)
+            return false;
+
+    return true;
 }
 
 void DS::swap(DS::String& lhs, DS::String& rhs)
@@ -1839,9 +1880,4 @@ void DS::swap(DS::String& lhs, DS::String& rhs)
     DS::String temp = lhs;
     lhs = rhs;
     rhs = temp;
-}
-
-std::ostream& DS::operator<<(std::ostream& os, const typename DS::String& str) 
-{
-    return os << str.c_str();
 }
