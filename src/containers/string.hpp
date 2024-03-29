@@ -3,8 +3,8 @@
 #include <stdexcept>
 #include <unistd.h>
 #include <string.h>
-#include "../header/allocator.h"
-#include "../header/string.h"
+#include "../../header/allocator/allocator.h"
+#include "../../header/containers/string.h"
 
 DS::String::Base_Iterator::Base_Iterator(char* p)
             : ptr(p)

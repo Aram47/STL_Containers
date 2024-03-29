@@ -32,6 +32,6 @@ public:
 
 }
 
-#include "../src/allocator.hpp"
+#include "../../src/allocator/allocator.hpp"
 
 #endif

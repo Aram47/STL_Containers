@@ -5,7 +5,7 @@
 #include <initializer_list>
 #include <stdexcept>
 #include <unistd.h>
-#include "./allocator.h"
+#include "../allocator/allocator.h"
 
 namespace DS
 {
@@ -276,6 +276,6 @@ void swap(String&, String&);
 
 }
 
-#include "../src/string.hpp"
+#include "../../src/containers/string.hpp"
 
 #endif
