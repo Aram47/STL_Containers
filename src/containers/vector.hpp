@@ -1,9 +1,8 @@
-#include "../../header/containers/vector.h"
-
 #include <iostream>
 #include <initializer_list>
 #include <stdexcept>
 #include <unistd.h> 
+#include "../../header/containers/vector.h"
 
 template <typename T>
 DS::Vector<T>::Base_Iterator::Base_Iterator(T* p)
