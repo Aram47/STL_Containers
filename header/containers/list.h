@@ -19,8 +19,10 @@ private:
         Node* prev;
 
         Node();
-        Node(const T& value);
-        Node(T&&);
+        Node(const T&);
+        Node(const Node& value);
+        Node(Node&& value);
+        ~Node();
     };
 
     Node* m_head;
@@ -29,7 +31,7 @@ private:
 private:
     class Base_Iterator
     {
-        friend class List<T>;
+        friend class List<T, Alloc>;
     private:
         T* ptr = nullptr;
     public:
@@ -52,7 +54,7 @@ public:
 
     class Const_Iterator : public Base_Iterator
     {
-        friend class List<T>;
+        friend class List<T, Alloc>;
   
     protected:
         explicit Const_Iterator(T*);
@@ -79,7 +81,7 @@ public:
 
     class Iterator : public Const_Iterator
     {
-        friend class List<T>;
+        friend class List<T, Alloc>;
     public:
         Iterator();
         Iterator(const Base_Iterator&);
@@ -107,7 +109,7 @@ public:
 
     class Const_Reverse_Iterator : public Base_Iterator
     {
-        friend class List<T>;
+        friend class List<T, Alloc>;
   
     protected:
         explicit Const_Reverse_Iterator(T*);
@@ -135,7 +137,7 @@ public:
 
     class Reverse_Iterator : public Const_Reverse_Iterator
     {
-        friend class List<T>;
+        friend class List<T, Alloc>;
     public:
         Reverse_Iterator();
         Reverse_Iterator(const Base_Iterator&);
@@ -177,9 +179,9 @@ public:
     List(std::initializer_list<T> init, const Alloc& alloc = Alloc());
     ~List();
 
-    List& operator=(const list& other);
+    List& operator=(const List& other);
     List& operator=(List&& other);
-    List& operator=( std::initializer_list<T> ilist);
+    List& operator=(std::initializer_list<T> ilist);
 
     void assign(std::size_t count, const T& value);	
     void assign(Iterator first, Iterator last);
@@ -227,10 +229,6 @@ public:
 
     void merge(List& other);
     void merge(List&& other);
-    // template <typename Compare>
-    // void merge(List& other, Compare comp);	
-    // template <typename Compare>
-    // void merge(List&& other, Compare comp);
 
     void splice(Const_Iterator pos, List& other);
     void splice(Const_Iterator pos, List&& other);

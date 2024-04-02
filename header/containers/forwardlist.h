@@ -4,10 +4,10 @@
 #include <iostream>
 #include "../allocator/allocator.h"
 
-template <typename T, typename Alloc = DS::Allocator<T>> class Forward_List;
-
 namespace DS
 {
+
+template <typename T, typename Alloc = DS::Allocator<T>> class Forward_List;
 
 template <typename T, typename Alloc>
 class Forward_List
@@ -19,19 +19,19 @@ private:
         Node* next;
 
         Node();
-        Node(const T& value);
-        Node(T&&);
+        Node(const T&);
+        Node(const Node&);
+        Node(Node&&);
+        ~Node();
     };
-
-    Node* m_head;
 
 private:
 
     class Base_Iterator
     {
-        friend class List<T>;
+        friend class Forward_List<T, Alloc>;
     private:
-        T* ptr = nullptr;
+        Node* m_ptr = nullptr;
     public:
         ~Base_Iterator();
         bool operator<(const Base_Iterator&) const;
@@ -45,17 +45,17 @@ private:
         const Base_Iterator& operator=(Base_Iterator&&);
 
     protected:
-        explicit Base_Iterator(T*);
+        explicit Base_Iterator(Node*);
     };
 
 public:
 
     class Const_Iterator : public Base_Iterator
     {
-        friend class List<T>;
+        friend class Forward_List<T, Alloc>;
   
     protected:
-        explicit Const_Iterator(T*);
+        explicit Const_Iterator(Node*);
     public:
         Const_Iterator();
         Const_Iterator(const Base_Iterator&);
@@ -68,18 +68,14 @@ public:
         const T* operator->();
         const Const_Iterator& operator++();
         const Const_Iterator& operator++(int);
-        const Const_Iterator& operator--();
-        const Const_Iterator& operator--(int);
         Const_Iterator operator+(long long int) const;
-        Const_Iterator operator-(long long int) const;
         const Const_Iterator& operator+=(long long int);
-        const Const_Iterator& operator-=(long long int);
         const T& operator[](std::size_t) const;
     };
 
     class Iterator : public Const_Iterator
     {
-        friend class List<T>;
+        friend class Forward_List<T, Alloc>;
     public:
         Iterator();
         Iterator(const Base_Iterator&);
@@ -93,16 +89,12 @@ public:
 
         Iterator& operator++();
         Iterator& operator++(int);
-        Iterator& operator--();
-        Iterator& operator--(int);
         Iterator operator+(long long int) const;
-        Iterator operator-(long long int) const;
         Iterator& operator+=(long long int);
-        Iterator& operator-=(long long int);
 
         T& operator[](std::size_t);
     protected:
-        explicit Iterator(T*);
+        explicit Iterator(Node*);
     };
 
 public:
@@ -186,6 +178,10 @@ public:
     void reverse() noexcept;
     std::size_t unique();
     void sort();
+
+private:
+    Node* m_head;
+    Alloc m_allocator;
 };
 
 template <typename T, typename Alloc>
@@ -202,7 +198,7 @@ template <typename T, typename Alloc>
 bool operator>=( const DS::Forward_List<T, Alloc>& lhs, const DS::Forward_List<T, Alloc>& rhs);
 
 template <typename T, typename Alloc>
-void swap(DS::Forward_List<T, Alloc>& lhs, DS::Forward_List<T, Alloc>& rhs) noexcept(lhs.swap(rhs));
+void swap(DS::Forward_List<T, Alloc>& lhs, DS::Forward_List<T, Alloc>& rhs);
 
 template< class T, class Alloc, class U >
 std::size_t erase(DS::Forward_List<T, Alloc>& c, const U& value);
