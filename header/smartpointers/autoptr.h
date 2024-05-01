@@ -13,18 +13,18 @@ private:
     T* ptr = nullptr;
 public:
     template <typename X>
-    explicit Auto_Ptr(X* p = 0) throw();
-    Auto_Ptr(Auto_Ptr& r) throw();
+    explicit Auto_Ptr(X* = 0) throw();
+    Auto_Ptr(Auto_Ptr&) throw();
     template <typename Y>
-    Auto_Ptr(Auto_Ptr<Y>& r) throw();
+    Auto_Ptr(Auto_Ptr<Y>&) throw();
     template <typename X>
-    Auto_Ptr(Auto_Ptr<X>& m) throw();
+    Auto_Ptr(Auto_Ptr<X>&) throw();
     ~Auto_ptr() throw();
 
-    Auto_Ptr& operator=(Auto_Ptr& r) throw();
+    Auto_Ptr& operator=(Auto_Ptr&) throw();
     template <typename Y>
-    Auto_Ptr& operator=(Auto_Ptr<Y>& r) throw();
-    Auto_Ptr& operator=(Auto_Ptr<T>& m) throw();
+    Auto_Ptr& operator=(Auto_Ptr<Y>&) throw();
+    Auto_Ptr& operator=(Auto_Ptr<T>&) throw();
 
     template <typename Y>
     operator Auto_Ptr<Y>&() throw();
@@ -36,9 +36,13 @@ public:
     T& operator*() const throw();
     T* operator->() const throw();
 
-    void reset(T* p = 0) throw();
+    void reset(T* = 0) throw();
     T* release() throw();
 };
+
+template <>
+class Auto_Ptr<void> {};
+
 }
 
 #include "../../src/smartpointers/autoptr.hpp"
