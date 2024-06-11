@@ -1,50 +1,50 @@
-#ifndef AUTO_PTR_H
-#define AUTO_PTR_H
+// #ifndef AUTO_PTR_H
+// #define AUTO_PTR_H
 
-#include <iostream>
+// #include <iostream>
 
-namespace DS
-{
+// namespace DS
+// {
 
-template <typename T>
-class Auto_Ptr
-{
-private:
-    T* ptr = nullptr;
-public:
-    template <typename X>
-    explicit Auto_Ptr(X* = 0) throw();
-    Auto_Ptr(Auto_Ptr&) throw();
-    template <typename Y>
-    Auto_Ptr(Auto_Ptr<Y>&) throw();
-    template <typename X>
-    Auto_Ptr(Auto_Ptr<X>&) throw();
-    ~Auto_ptr() throw();
+// template <typename T>
+// class Auto_Ptr
+// {
+// private:
+//     T* ptr = nullptr;
+// public:
+//     template <typename X>
+//     explicit Auto_Ptr(X* = 0) throw();
+//     Auto_Ptr(Auto_Ptr&) throw();
+//     template <typename Y>
+//     Auto_Ptr(Auto_Ptr<Y>&) throw();
+//     template <typename X>
+//     Auto_Ptr(Auto_Ptr<X>&) throw();
+//     ~Auto_ptr() throw();
 
-    Auto_Ptr& operator=(Auto_Ptr&) throw();
-    template <typename Y>
-    Auto_Ptr& operator=(Auto_Ptr<Y>&) throw();
-    Auto_Ptr& operator=(Auto_Ptr<T>&) throw();
+//     Auto_Ptr& operator=(Auto_Ptr&) throw();
+//     template <typename Y>
+//     Auto_Ptr& operator=(Auto_Ptr<Y>&) throw();
+//     Auto_Ptr& operator=(Auto_Ptr<T>&) throw();
 
-    template <typename Y>
-    operator Auto_Ptr<Y>&() throw();
-    template <typename Y>
-    operator Auto_Ptr<Y>() throw();
+//     template <typename Y>
+//     operator Auto_Ptr<Y>&() throw();
+//     template <typename Y>
+//     operator Auto_Ptr<Y>() throw();
 
-    T* get() const throw();
+//     T* get() const throw();
 
-    T& operator*() const throw();
-    T* operator->() const throw();
+//     T& operator*() const throw();
+//     T* operator->() const throw();
 
-    void reset(T* = 0) throw();
-    T* release() throw();
-};
+//     void reset(T* = 0) throw();
+//     T* release() throw();
+// };
 
-template <>
-class Auto_Ptr<void> {};
+// template <>
+// class Auto_Ptr<void> {};
 
-}
+// }
 
-#include "../../src/smartpointers/autoptr.hpp"
+// #include "../../src/smartpointers/autoptr.hpp"
 
-#endif
+// #endif

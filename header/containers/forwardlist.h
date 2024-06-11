@@ -2,6 +2,9 @@
 #define FORWARD_LIST_H
 
 #include <iostream>
+#include <initializer_list>
+#include <stdexcept>
+#include <unistd.h> 
 #include "../allocator/allocator.h"
 
 namespace DS
@@ -13,26 +16,16 @@ template <typename T, typename Alloc>
 class Forward_List
 {
 private:
-
-    struct Node {
-        T data;
-        Node* next;
-
-        Node();
-        Node(const T&);
-        Node(const Node&);
-        Node(Node&&);
-        ~Node();
-    };
-
-private:
-
+    struct Node;
     class Base_Iterator
     {
         friend class Forward_List<T, Alloc>;
-    private:
-        Node* m_ptr = nullptr;
+    // private:
     public:
+        Node* m_node = nullptr;
+    public:
+        Base_Iterator(const Base_Iterator&) = default;
+        Base_Iterator(Base_Iterator&&) = default;
         ~Base_Iterator();
         bool operator<(const Base_Iterator&) const;
         bool operator>(const Base_Iterator&) const;
@@ -66,8 +59,8 @@ public:
 
         const T& operator*();
         const T* operator->();
-        const Const_Iterator& operator++();
-        const Const_Iterator& operator++(int);
+        Const_Iterator& operator++();
+        const Const_Iterator operator++(int);
         Const_Iterator operator+(long long int) const;
         const Const_Iterator& operator+=(long long int);
         const T& operator[](std::size_t) const;
@@ -88,7 +81,7 @@ public:
         T* operator->();
 
         Iterator& operator++();
-        Iterator& operator++(int);
+        const Iterator operator++(int);
         Iterator operator+(long long int) const;
         Iterator& operator+=(long long int);
 
@@ -124,16 +117,13 @@ public:
     T& front();
     const T& front() const;
 
-    Iterator before_begin() noexcept;
-    Const_Iterator before_begin() const noexcept;
+    Iterator before_begin() const noexcept;
     Const_Iterator cbefore_begin() const noexcept;
 
-    Iterator begin() noexcept;
-    Const_Iterator begin() const noexcept;
+    Iterator begin() const noexcept;
     Const_Iterator cbegin() const noexcept;
 
-    Iterator end() noexcept;
-    Const_Iterator end() const noexcept;
+    Iterator end() const noexcept;
     Const_Iterator cend() const noexcept;
 
     bool empty() const noexcept;
@@ -146,18 +136,11 @@ public:
     Iterator insert_after(Const_Iterator pos, Const_Iterator first, Const_Iterator last);
     Iterator insert_after(Const_Iterator pos, std::initializer_list<T> ilist);
 
-    template <typename... Args>
-    Iterator emplace_after(Const_Iterator pos, Args&&... args);
     Iterator erase_after(Const_Iterator pos);
     Iterator erase_after(Const_Iterator first, Const_Iterator last);
 
     void push_front(const T& value);
     void push_front(T&& value);
-
-    template <typename... Args>
-    void emplace_front(Args&&... args);
-    template <typename... Args>
-    T& emplace_front(Args&&... args);
 
     void pop_front();
     void resize(std::size_t count);
@@ -180,8 +163,21 @@ public:
     void sort();
 
 private:
+    struct Node {
+        friend class Base_Iterator;
+        friend class Const_Iterator;
+        friend class Iterator;
+    private:
+        T data;
+    public:
+        Node* next = nullptr;
+        Node();
+        Node(const T&);
+        ~Node();
+    };
     Node* m_head;
-    Alloc m_allocator;
+    Alloc m_all;
+    DS::Allocator<Node> m_allocator;
 };
 
 template <typename T, typename Alloc>
