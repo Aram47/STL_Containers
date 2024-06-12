@@ -17,10 +17,10 @@ class Forward_List
 {
 private:
     struct Node;
+
     class Base_Iterator
     {
         friend class Forward_List<T, Alloc>;
-    // private:
     public:
         Node* m_node = nullptr;
     public:
@@ -159,7 +159,7 @@ public:
 
     std::size_t remove(const T& value);
     void reverse() noexcept;
-    std::size_t unique();
+    void unique();
     void sort();
 
 private:
@@ -195,9 +195,6 @@ bool operator>=( const DS::Forward_List<T, Alloc>& lhs, const DS::Forward_List<T
 
 template <typename T, typename Alloc>
 void swap(DS::Forward_List<T, Alloc>& lhs, DS::Forward_List<T, Alloc>& rhs);
-
-template< class T, class Alloc, class U >
-std::size_t erase(DS::Forward_List<T, Alloc>& c, const U& value);
 }
 
 #include "../../src/containers/forwardlist.hpp"

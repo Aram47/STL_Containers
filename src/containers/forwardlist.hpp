@@ -1157,6 +1157,7 @@ std::size_t DS::Forward_List<T, Alloc>::remove(const T& value)
             }
         }
     }
+
 }
 
 template <typename T, typename Alloc>
@@ -1185,20 +1186,25 @@ void DS::Forward_List<T, Alloc>::reverse() noexcept
 }
 
 template <typename T, typename Alloc>
-std::size_t DS::Forward_List<T, Alloc>::unique()
+void DS::Forward_List<T, Alloc>::unique()
 {
-    std::size_t cnt = 0;
-    if (this -> m_head) {
-        for (auto it = this->begin(); it != this->end(); ++it) {
-            auto del = it;
-            ++del;
-            if (*it == *del) {
-                this->erase_after(it);
-                ++cnt;
+    if (this->m_head) {
+        auto prev = this->begin();
+        auto next = prev;
+        ++next;
+
+        while ((next) != (this->end())) {
+            if ((*prev) == (*next)) {
+                Node* temp = next.m_node;
+                (prev.m_node)->next = (prev.m_node)-> next ->next;
+                m_allocator.deallocate(temp, sizeof(Node));
+                next.m_node = (prev.m_node)->next;
+            } else {
+                ++prev;
+                ++next;
             }
         }
     }
-    return cnt;
 }
 
 template <typename T, typename Alloc>
@@ -1223,43 +1229,76 @@ void DS::Forward_List<T, Alloc>::sort()
 template <typename T, typename Alloc>
 bool DS::operator==(const DS::Forward_List<T, Alloc>& lhs, const DS::Forward_List<T, Alloc>& rhs)
 {
+    auto i = lhs.begin();
+    auto j = rhs.begin();
 
+    while ((i != lhs.end()) && (j != rhs.end())) {
+        if (*i != *j) {
+            return false;
+        }
+        ++i;
+        ++j;
+    }
+
+    if ((i == lhs.end()) && (j == rhs.end())) {
+        return true;
+    }
+
+    return false;
 }
 
 template <typename T, typename Alloc>
 bool DS::operator!=(const DS::Forward_List<T, Alloc>& lhs, const DS::Forward_List<T, Alloc>& rhs)
 {
-
+    return !(lhs == rhs);
 }
+
 template <typename T, typename Alloc>
 bool DS::operator<(const DS::Forward_List<T, Alloc>& lhs, const DS::Forward_List<T, Alloc>& rhs)
 {
+    auto i = lhs.begin();
+    auto j = rhs.begin();
 
+    while ((i != lhs.end()) && (j != rhs.end())) {
+        if (*i >= *j) {
+            return false;
+        }
+        ++i;
+        ++j;
+    }
+
+    if ((i == lhs.end()) && (j != rhs.end()))
+        return true;
+
+    return false;
 }
+
 template <typename T, typename Alloc>
 bool DS::operator<=(const DS::Forward_List<T, Alloc>& lhs, const DS::Forward_List<T, Alloc>& rhs)
 {
-
+    return !(lhs > rhs);
 }
+
 template <typename T, typename Alloc>
 bool DS::operator>(const DS::Forward_List<T, Alloc>& lhs, const DS::Forward_List<T, Alloc>& rhs)
 {
-
+    return (lhs < rhs) && (lhs != rhs);
 }
+
 template <typename T, typename Alloc>
 bool DS::operator>=( const DS::Forward_List<T, Alloc>& lhs, const DS::Forward_List<T, Alloc>& rhs)
 {
-
+    return !(lhs < rhs);
 }
 
 template <typename T, typename Alloc>
 void DS::swap(DS::Forward_List<T, Alloc>& lhs, DS::Forward_List<T, Alloc>& rhs)
 {
-
-}
-
-template< class T, class Alloc, class U >
-std::size_t DS::erase(DS::Forward_List<T, Alloc>& c, const U& value)
-{
-
+    if (&lhs != &rhs)
+    {
+        DS::Forward_List<T> tmp;
+        tmp.m_head = lhs.m_head;
+        lhs.m_head = rhs.m_head;
+        rhs.m_head = tmp.m_head;
+    }
 }
