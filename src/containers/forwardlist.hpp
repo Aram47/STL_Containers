@@ -1130,6 +1130,7 @@ void DS::Forward_List<T, Alloc>::splice_after(DS::Forward_List<T, Alloc>::Const_
 template <typename T, typename Alloc>
 std::size_t DS::Forward_List<T, Alloc>::remove(const T& value)
 {   
+    std::size_t cnt = 0;
     if (this->m_head) {
         auto prev = this->begin();
         for (auto it = this->begin(); it != this->end(); ++it)
@@ -1137,6 +1138,7 @@ std::size_t DS::Forward_List<T, Alloc>::remove(const T& value)
             if ((*it == value) && ((it.m_node)->next == nullptr)) {
                 m_allocator.deallocate((prev.m_node)->next, sizeof(Node));
                 (prev.m_node)->next = nullptr;
+                ++cnt;
                 break;
             } else if ((*it == value)) {
                 auto i = it;
@@ -1146,6 +1148,7 @@ std::size_t DS::Forward_List<T, Alloc>::remove(const T& value)
                 m_allocator.deallocate((it.m_node)->next, sizeof(Node));
                 (it.m_node)->next = temp;
                 it = prev;
+                ++cnt;
             }
             prev = it;
         }
@@ -1154,10 +1157,11 @@ std::size_t DS::Forward_List<T, Alloc>::remove(const T& value)
                 Node* temp = this->m_head->next;
                 m_allocator.deallocate(this->m_head, sizeof(Node));
                 this->m_head = temp;
+                ++cnt;
             }
         }
     }
-
+    return cnt;
 }
 
 template <typename T, typename Alloc>
